@@ -14,9 +14,9 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Search, Menu, Settings, User, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { logout } from '@/modules/auth/actions';
 
-// Adapted from shadcn/ui Blocks: Dashboard > Header navigation
-// https://ui.shadcn.com/blocks#dashboard
+
 interface HeaderProps {
   children: React.ReactNode;
 }
@@ -103,11 +103,13 @@ export function Header({ children }: HeaderProps) {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/signout">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign out</span>
-                  </Link>
+                <DropdownMenuItem className="p-0">
+                  <form action={logout} className="w-full">
+                    <button type="submit" className="flex w-full items-center px-2 py-1.5 text-sm">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </button>
+                  </form>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -13,14 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function SignIn() {
+export default function Login() {
   const [state, action, pending] = useActionState(signin, undefined);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
+          <CardTitle className="text-2xl font-bold">Login</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -59,7 +59,7 @@ export default function SignIn() {
             )}
 
             <Button disabled={pending} type="submit" className="w-full">
-              {pending ? "Signing In..." : "Sign In"}
+              {pending ? "Logging In..." : "Login"}
             </Button>
           </form>
         </CardContent>

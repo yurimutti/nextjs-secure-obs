@@ -7,12 +7,13 @@ export async function POST(request: NextRequest) {
     // Mock authentication logic
     if (email === "teste@email.com" && password === "123456") {
       // Mock JWT token
-      const mockJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZW1haWwiOiJ0ZXN0ZUBlbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.mock-signature";
-      
+      const mockJWT =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZW1haWwiOiJ0ZXN0ZUBlbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.mock-signature";
+
       return NextResponse.json(
-        { 
+        {
           token: mockJWT,
-          message: "Authentication successful" 
+          message: "Authentication successful",
         },
         { status: 200 }
       );

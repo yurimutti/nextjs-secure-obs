@@ -5,8 +5,6 @@ import { RecentActivityTable } from '@/components/recent-activity-table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { mockStats, mockActivity } from '@/shared/libs/mock';
 
-// Adapted from shadcn/ui Blocks: Dashboard > Layout with sidebar
-// https://ui.shadcn.com/blocks#dashboard
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
