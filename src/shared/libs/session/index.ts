@@ -29,11 +29,13 @@ export async function decrypt(session: string | undefined = "") {
 
 export async function createSession(token: string): Promise<void> {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  // TODO: expiresAt name
   const session = await encrypt({ token, expiresAt });
   const cookieStore = await cookies();
 
   cookieStore.set("session", session, {
     httpOnly: true,
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     expires: expiresAt,
     path: "/",
@@ -53,6 +55,7 @@ export async function updateSession() {
   const cookieStore = await cookies();
   cookieStore.set("session", session, {
     httpOnly: true,
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     expires: expires,
     path: "/",

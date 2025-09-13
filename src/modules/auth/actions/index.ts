@@ -30,26 +30,20 @@ export async function signin(state: FormState, formData: FormData) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
+      credentials: "include",
     }
   );
 
   const data = await response.json();
 
-  console.log('🔐 Login API response:', { ok: response.ok, hasToken: !!data.token });
-  
   if (response.ok && data.token) {
-    console.log('✅ Login successful, creating session...');
-    
     // Create session with the JWT token from API
     const { createSession } = await import("@/shared/libs/session");
     await createSession(data.token);
-    
-    console.log('🍪 Session created, redirecting to dashboard...');
 
     // Redirect to dashboard
     redirect("/dashboard");
   } else {
-    console.log('❌ Login failed:', data);
     return {
       message: data.message || "Authentication failed",
     };
