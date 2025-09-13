@@ -7,26 +7,21 @@ const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login', '/logout', '/']
 
 export default async function middleware(req: NextRequest) {
-  console.log('🚀 Middleware running for path:', req.nextUrl.pathname)
-
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname
   const isProtectedRoute = protectedRoutes.includes(path)
   const isPublicRoute = publicRoutes.includes(path)
 
-  console.log('Path analysis:', { path, isProtectedRoute, isPublicRoute })
-
   // 3. Decrypt the session from the cookie
   const cookieStore = await cookies()
   const sessionCookie = cookieStore.get('session')?.value
-  const authTokenCookie = cookieStore.get('auth-token')?.value
-
-  console.log('All cookies:', cookieStore.getAll().map(c => ({ name: c.name, hasValue: !!c.value })))
-  console.log('Session cookie:', sessionCookie ? 'exists' : 'missing')
-  console.log('Auth-token cookie:', authTokenCookie ? 'exists' : 'missing')
 
   const session = await decrypt(sessionCookie)
-  console.log('Decrypted session:', session)
+
+  // console.log('Middleware - Path:', path)
+  // console.log('Middleware - Is Protected Route:', isProtectedRoute)
+  // console.log('Middleware - Is Public Route:', isPublicRoute)
+  // console.log('Middleware - Session:', session)
 
   // 4. Redirect to /login if the user is not authenticated
   if (isProtectedRoute && !session?.token) {

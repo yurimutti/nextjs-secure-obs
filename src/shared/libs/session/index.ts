@@ -36,7 +36,6 @@ export async function createSession(token: string): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     expires: expiresAt,
-    sameSite: "lax",
     path: "/",
   });
 }
@@ -56,7 +55,6 @@ export async function updateSession() {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     expires: expires,
-    sameSite: "lax",
     path: "/",
   });
 }
