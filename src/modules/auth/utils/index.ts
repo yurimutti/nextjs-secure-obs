@@ -1,3 +1,5 @@
+import { env } from "@/config/env";
+
 interface AuthFetchOptions extends RequestInit {
   baseUrl?: string;
 }
@@ -7,7 +9,7 @@ const buildFullUrl = (url: string, baseUrl: string) =>
 
 export async function authFetch(url: string, options: AuthFetchOptions = {}) {
   const {
-    baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+    baseUrl = env.NEXT_PUBLIC_API_BASE_URL,
     ...fetchOptions
   } = options;
 

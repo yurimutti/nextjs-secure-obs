@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Card,
@@ -6,7 +6,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -14,35 +14,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
-import { cn } from '@/shared/utils/cn';
-import { useRecentActivities, useRefreshActivities } from '@/modules/dashboard/hooks/use-recent-activities';
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { cn } from "@/shared/utils/cn";
+import {
+  useRecentActivities,
+  useRefreshActivities,
+} from "@/modules/dashboard/hooks/use-recent-activities";
 
 const statusConfig = {
   success: {
-    label: 'Sucesso',
-    className: 'bg-green-50 text-green-700 border-green-200',
+    label: "Sucesso",
+    className: "bg-green-50 text-green-700 border-green-200",
   },
   warning: {
-    label: 'Aviso',
-    className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    label: "Aviso",
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200",
   },
   error: {
-    label: 'Erro',
-    className: 'bg-red-50 text-red-700 border-red-200',
+    label: "Erro",
+    className: "bg-red-50 text-red-700 border-red-200",
   },
 } as const;
 
 export function RecentActivities() {
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  } = useRecentActivities({ limit: 8 });
+  const { data, isLoading, error, refetch } = useRecentActivities({ limit: 8 });
 
   const refreshMutation = useRefreshActivities();
 
@@ -52,18 +50,16 @@ export function RecentActivities() {
   const handleRefresh = async () => {
     try {
       await refreshMutation.mutateAsync({ limit: 8 });
-    } catch {
-      // Error is handled by the mutation's onError callback
-    }
+    } catch {}
   };
 
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(timestamp).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -72,14 +68,15 @@ export function RecentActivities() {
       <Card>
         <CardHeader>
           <CardTitle>Atividades Recentes</CardTitle>
-          <CardDescription>
-            Últimas ações e eventos do usuário
-          </CardDescription>
+          <CardDescription>Últimas ações e eventos do usuário</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex justify-between items-center p-3 border rounded-lg">
+              <div
+                key={i}
+                className="flex justify-between items-center p-3 border rounded-lg"
+              >
                 <div className="space-y-2 flex-1">
                   <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
                   <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
@@ -101,17 +98,21 @@ export function RecentActivities() {
       <Card>
         <CardHeader>
           <CardTitle>Atividades Recentes</CardTitle>
-          <CardDescription>
-            Últimas ações e eventos do usuário
-          </CardDescription>
+          <CardDescription>Últimas ações e eventos do usuário</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
             <p className="text-muted-foreground">
-              {error instanceof Error ? error.message : 'Erro ao carregar atividades'}
+              {error instanceof Error
+                ? error.message
+                : "Erro ao carregar atividades"}
             </p>
-            <Button onClick={() => refetch()} variant="outline" disabled={isRefreshing}>
-              {isRefreshing ? 'Tentando...' : 'Tentar Novamente'}
+            <Button
+              onClick={() => refetch()}
+              variant="outline"
+              disabled={isRefreshing}
+            >
+              {isRefreshing ? "Tentando..." : "Tentar Novamente"}
             </Button>
           </div>
         </CardContent>
@@ -124,9 +125,7 @@ export function RecentActivities() {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="space-y-1">
           <CardTitle>Atividades Recentes</CardTitle>
-          <CardDescription>
-            Últimas ações e eventos do usuário
-          </CardDescription>
+          <CardDescription>Últimas ações e eventos do usuário</CardDescription>
         </div>
         <Button
           variant="outline"
@@ -134,7 +133,9 @@ export function RecentActivities() {
           onClick={handleRefresh}
           disabled={isRefreshing}
         >
-          <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+          <RefreshCw
+            className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+          />
         </Button>
       </CardHeader>
       <CardContent className="p-0">

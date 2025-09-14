@@ -3,27 +3,24 @@
 import { deleteSession } from "@/shared/libs/session";
 import { redirect } from "next/navigation";
 import { FormState, SigninFormSchema } from "../definitions";
+import { env } from "@/config/env";
 
 export async function signin(state: FormState, formData: FormData) {
-  // Validate form fields
   const validatedFields = SigninFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  // If any form fields are invalid, return early
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
-  // Call the auth API to authenticate user
   const { email, password } = validatedFields.data;
 
-  // TODO: improve this setup to avoid hardcoding the base URL
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/auth/login`,
+    `${env.API_BASE_URL}/api/auth/login`,
     {
       method: "POST",
       headers: {
@@ -37,24 +34,18 @@ export async function signin(state: FormState, formData: FormData) {
   const data = await response.json();
 
   if (response.ok && data.token) {
-    // Create session with the JWT token from API
     const { createSession } = await import("@/shared/libs/session");
     await createSession(data.token);
 
-    // Redirect to dashboard
     redirect("/dashboard");
-  } else {
-    return {
-      message: data.message || "Authentication failed",
-    };
   }
 
   return {
-    message: "Network error. Please try again.",
+    message: data.message || "Authentication failed",
   };
 }
 
 export async function logout() {
   await deleteSession();
-  redirect("/login");
+  redirect("/logout");
 }

@@ -1,12 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authFetch } from '@/modules/auth/utils';
-import type { RecentActivitiesResponse, RecentActivitiesParams } from '@/modules/dashboard/types/activity';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { authFetch } from "@/modules/auth/utils";
+import type {
+  RecentActivitiesResponse,
+  RecentActivitiesParams,
+} from "@/modules/dashboard/types/activity";
+import toast from "react-hot-toast";
 
 const QUERY_KEYS = {
-  recentActivities: (params?: RecentActivitiesParams) => [
-    'recent-activities',
-    params,
-  ] as const,
+  recentActivities: (params?: RecentActivitiesParams) =>
+    ["recent-activities", params] as const,
 } as const;
 
 async function fetchRecentActivities(
@@ -22,8 +24,12 @@ async function fetchRecentActivities(
   const response = await authFetch(`/api/recent-activities?${searchParams}`);
 
   if (!response.ok) {
-    const error = new Error('Failed to fetch recent activities') as Error & { status: number };
+    const error = new Error("Failed to fetch recent activities") as Error & {
+      status: number;
+    };
     error.status = response.status;
+    toast.error(`Error ${response.status}: ${response.statusText}`);
+
     throw error;
   }
 
@@ -47,13 +53,10 @@ export function useRefreshActivities() {
       return fetchRecentActivities(params);
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(
-        QUERY_KEYS.recentActivities(variables),
-        data
-      );
+      queryClient.setQueryData(QUERY_KEYS.recentActivities(variables), data);
     },
     onError: (error) => {
-      console.error('Failed to refresh activities:', error);
+      console.error("Failed to refresh activities:", error);
     },
   });
 }
@@ -63,7 +66,7 @@ export function useInvalidateActivities() {
 
   return () => {
     queryClient.invalidateQueries({
-      queryKey: ['recent-activities'],
+      queryKey: ["recent-activities"],
     });
   };
 }

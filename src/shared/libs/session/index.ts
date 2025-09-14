@@ -25,7 +25,6 @@ export async function decrypt(session: string | undefined = "") {
     return payload;
   } catch (error) {
     Sentry.captureException(error);
-    console.log("Failed to verify session");
   }
 }
 

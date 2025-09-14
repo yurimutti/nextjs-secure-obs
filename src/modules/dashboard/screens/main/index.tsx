@@ -54,7 +54,6 @@ export async function DashboardScreen() {
         </p>
       </div>
 
-      {/* User Profile Section */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>User Profile</CardTitle>
@@ -90,7 +89,6 @@ export async function DashboardScreen() {
         </CardContent>
       </Card>
 
-      {/* Recent Activities and Sentry Test */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-8">
         <div className="lg:col-span-2">
           <RecentActivities />

@@ -1,19 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { SignJWT } from "jose";
+import { env } from "@/config/env";
+
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    // Mock authentication logic
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
     if (email === "teste@email.com" && password === "123456") {
-      // Mock JWT token
-      const mockJWT =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZW1haWwiOiJ0ZXN0ZUBlbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.mock-signature";
+      const token = await new SignJWT({
+        sub: "1234567890",
+        email: email,
+        iat: Math.floor(Date.now() / 1000),
+      })
+        .setProtectedHeader({ alg: "HS256" })
+        .setExpirationTime("24h")
+        .sign(JWT_SECRET);
+
+      console.log("Generated JWT Token:", token);
 
       return NextResponse.json(
         {
-          token: mockJWT,
+          token,
           message: "Authentication successful",
         },
         { status: 200 }

@@ -2,6 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getSession } from "@/shared/libs/session";
+import { env } from "@/config/env";
 
 interface AuthFetchOptions extends RequestInit {
   baseUrl?: string;
@@ -12,7 +13,7 @@ const buildFullUrl = (url: string, baseUrl: string) =>
 
 export async function authFetchServer(url: string, options: AuthFetchOptions = {}) {
   const {
-    baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+    baseUrl = env.API_BASE_URL,
     ...fetchOptions
   } = options;
 
