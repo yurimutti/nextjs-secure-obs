@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
+import * as Sentry from "@sentry/nextjs";
 
 import "server-only";
 import { SessionPayload } from "@/modules/auth/definitions";
@@ -23,6 +24,7 @@ export async function decrypt(session: string | undefined = "") {
     });
     return payload;
   } catch (error) {
+    Sentry.captureException(error);
     console.log("Failed to verify session");
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     );
   } catch (error) {
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

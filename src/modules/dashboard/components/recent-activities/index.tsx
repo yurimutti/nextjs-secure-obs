@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { authFetch } from '@/modules/auth/utils';
 import {
   Card,
   CardContent,
@@ -21,21 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/shared/utils/cn';
-
-type Activity = {
-  id: string;
-  action: string;
-  timestamp: string;
-  details: string;
-  status: 'success' | 'warning' | 'error';
-  user?: string;
-};
-
-type RecentActivitiesResponse = {
-  activities: Activity[];
-  total: number;
-  hasMore: boolean;
-};
+import { useRecentActivities, useRefreshActivities } from '@/modules/dashboard/hooks/use-recent-activities';
 
 const statusConfig = {
   success: {
@@ -50,45 +34,27 @@ const statusConfig = {
     label: 'Erro',
     className: 'bg-red-50 text-red-700 border-red-200',
   },
-};
+} as const;
 
 export function RecentActivities() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    isLoading,
+    error,
+    refetch,
+  } = useRecentActivities({ limit: 8 });
 
-  const fetchActivities = async (isRefresh = false) => {
+  const refreshMutation = useRefreshActivities();
+
+  const activities = data?.activities ?? [];
+  const isRefreshing = refreshMutation.isPending;
+
+  const handleRefresh = async () => {
     try {
-      if (isRefresh) {
-        setIsRefreshing(true);
-      } else {
-        setIsLoading(true);
-      }
-
-      const response = await authFetch('/api/recent-activities?limit=8');
-
-      if (!response?.ok) {
-        throw new Error('Falha ao buscar atividades');
-      }
-
-      const data: RecentActivitiesResponse = await response.json();
-      setActivities(data.activities);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar atividades');
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      await refreshMutation.mutateAsync({ limit: 8 });
+    } catch {
+      // Error is handled by the mutation's onError callback
     }
-  };
-
-  useEffect(() => {
-    fetchActivities();
-  }, []);
-
-  const handleRefresh = () => {
-    fetchActivities(true);
   };
 
   const formatTimestamp = (timestamp: string) => {
@@ -141,9 +107,11 @@ export function RecentActivities() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <p className="text-muted-foreground">{error}</p>
-            <Button onClick={handleRefresh} variant="outline">
-              Tentar Novamente
+            <p className="text-muted-foreground">
+              {error instanceof Error ? error.message : 'Erro ao carregar atividades'}
+            </p>
+            <Button onClick={() => refetch()} variant="outline" disabled={isRefreshing}>
+              {isRefreshing ? 'Tentando...' : 'Tentar Novamente'}
             </Button>
           </div>
         </CardContent>

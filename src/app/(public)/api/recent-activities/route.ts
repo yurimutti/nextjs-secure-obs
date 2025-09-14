@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from '@/shared/libs/dal';
+import * as Sentry from '@sentry/nextjs'
 
 type Activity = {
   id: string;
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching recent activities:', error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { error: 'Failed to fetch recent activities' },
       { status: 500 }
