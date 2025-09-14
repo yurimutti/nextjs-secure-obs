@@ -1,18 +1,13 @@
-import { redirect } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Sidebar } from '@/components/sidebar';
-import { getSession } from '@/shared/libs/session';
+import { verifySession } from '@/shared/libs/dal';
 
 export default async function PrivateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
-
-  if (session === null) {
-    return redirect('/login');
-  }
+  await verifySession();
 
   return (
     <div className="min-h-screen bg-background">

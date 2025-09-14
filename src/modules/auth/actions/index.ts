@@ -1,9 +1,13 @@
 "use server";
 
-import { deleteSession } from "@/shared/libs/session";
 import { redirect } from "next/navigation";
 import { FormState, SigninFormSchema } from "../definitions";
 import { env } from "@/config/env";
+import {
+  clearAuthCookies,
+  setAccessCookie,
+  setRefreshCookie,
+} from "@/shared/libs/session";
 
 export async function signin(state: FormState, formData: FormData) {
   const validatedFields = SigninFormSchema.safeParse({
@@ -19,22 +23,19 @@ export async function signin(state: FormState, formData: FormData) {
 
   const { email, password } = validatedFields.data;
 
-  const response = await fetch(
-    `${env.API_BASE_URL}/api/auth/login`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    }
-  );
+  const response = await fetch(`${env.API_BASE_URL}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
   const data = await response.json();
 
-  if (response.ok && data.token) {
-    const { createSession } = await import("@/shared/libs/session");
-    await createSession(data.token);
+  if (data.message === "ok") {
+    await setAccessCookie(data.accessToken);
+    await setRefreshCookie(data.refreshToken);
 
     redirect("/dashboard");
   }
@@ -45,6 +46,17 @@ export async function signin(state: FormState, formData: FormData) {
 }
 
 export async function logout() {
-  await deleteSession();
+  // Call logout API to blacklist refresh token
+  try {
+    await fetch(`${env.API_BASE_URL}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    // Continue with local cleanup even if API fails
+    console.error("Logout API call failed:", error);
+  }
+
+  await clearAuthCookies();
   redirect("/logout");
 }

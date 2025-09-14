@@ -26,15 +26,26 @@ export async function authFetch(
   const response = await fetch(url, mergedOptions);
 
   if (response.status === 401) {
-    const refreshed = await fetch("/api/auth/refresh", {
+    const refreshResponse = await fetch("/api/auth/refresh", {
       method: "POST" as const,
       credentials: "include" as const,
     });
 
-    if (refreshed.ok) {
-      return fetch(url, mergedOptions);
+    if (refreshResponse.ok) {
+      const retryResponse = await fetch(url, mergedOptions);
+
+      if (retryResponse.status === 401) {
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        return retryResponse;
+      }
+
+      return retryResponse;
     } else {
-      window.location.href = "/login";
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
       return response;
     }
   }

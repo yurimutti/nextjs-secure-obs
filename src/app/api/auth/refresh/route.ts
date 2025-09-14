@@ -1,51 +1,53 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import { SignJWT, jwtVerify } from "jose";
-import { JWT_KEY } from "@/config/env";
+import {
+  getRefreshToken,
+  decryptRefreshToken,
+  encryptAccessToken,
+  encryptRefreshToken,
+  generateTokenId,
+  setAccessCookie,
+  setRefreshCookie,
+  blacklistJTI,
+} from "@/shared/libs/session";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const sessionCookie = request.cookies.get("session");
+    const refreshToken = await getRefreshToken();
 
-    if (!sessionCookie) {
+    if (!refreshToken) {
       return NextResponse.json(
-        { message: "No session found" },
+        { message: "No refresh token found" },
         { status: 401 }
       );
     }
 
-    const { getSession } = await import("@/shared/libs/session");
-    const sessionPayload = await getSession();
+    const refreshPayload = await decryptRefreshToken(refreshToken);
 
-    if (!sessionPayload || !sessionPayload.token) {
-      return NextResponse.json({ message: "Invalid session" }, { status: 401 });
-    }
-
-    try {
-      await jwtVerify(sessionPayload.token as string, JWT_KEY, {
-        algorithms: ["HS256"],
-      });
-    } catch {
+    if (!refreshPayload || !refreshPayload.userId || !refreshPayload.jti) {
       return NextResponse.json(
-        { message: "Invalid or expired token" },
+        { message: "Invalid refresh token" },
         { status: 401 }
       );
     }
 
-    const token = await new SignJWT({
-      iat: Math.floor(Date.now() / 1000),
-    })
-      .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("7d")
-      .sign(JWT_KEY);
+    const userId = refreshPayload.userId as string;
+    const oldJti = refreshPayload.jti as string;
 
-    const { createSession } = await import("@/shared/libs/session");
-    await createSession(token);
+    // Blacklist the old refresh token to prevent reuse
+    blacklistJTI(oldJti);
+
+    const newJti = generateTokenId();
+
+    const newAccessToken = await encryptAccessToken(userId);
+    const newRefreshToken = await encryptRefreshToken(userId, newJti);
+
+    await setAccessCookie(newAccessToken);
+    await setRefreshCookie(newRefreshToken);
 
     return NextResponse.json(
       {
-        token,
-        message: "Token refreshed successfully",
+        message: "ok",
       },
       { status: 200 }
     );

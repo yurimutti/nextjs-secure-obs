@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import { SignJWT } from "jose";
-import { JWT_KEY } from "@/config/env";
+import {
+  encryptAccessToken,
+  encryptRefreshToken,
+  generateTokenId,
+} from "@/shared/libs/session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,17 +18,17 @@ export async function POST(request: NextRequest) {
     }
 
     if (email === "teste@email.com" && password === "123456") {
-      const token = await new SignJWT({
-        iat: Math.floor(Date.now() / 1000),
-      })
-        .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("7d")
-        .sign(JWT_KEY);
+      const userId = "user-123";
+      const jti = generateTokenId();
+
+      const accessToken = await encryptAccessToken(userId);
+      const refreshToken = await encryptRefreshToken(userId, jti);
 
       return NextResponse.json(
         {
-          token,
-          message: "Authentication successful",
+          accessToken,
+          refreshToken,
+          message: "ok",
         },
         { status: 200 }
       );

@@ -34,5 +34,37 @@ export async function serverAuthFetch(
     headers: mergedHeaders,
   };
 
-  return fetch(url, requestInit);
+  const response = await fetch(url, requestInit);
+
+  if (response.status === 401) {
+    const refreshResponse = await fetch(`${origin}/api/auth/refresh`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        Cookie: cookieHeader,
+      },
+    });
+
+    if (refreshResponse.ok) {
+      const refreshCookies = refreshResponse.headers.get("set-cookie");
+      if (refreshCookies) {
+        mergedHeaders.set("Cookie", refreshCookies);
+      }
+
+      const retryResponse = await fetch(url, {
+        ...requestInit,
+        headers: mergedHeaders,
+      });
+
+      if (retryResponse.status === 401) {
+        throw new Error("Authentication failed after refresh");
+      }
+
+      return retryResponse;
+    } else {
+      throw new Error("Refresh token invalid");
+    }
+  }
+
+  return response;
 }

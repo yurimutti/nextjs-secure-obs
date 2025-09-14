@@ -2,67 +2,126 @@ import "server-only";
 import { cookies } from "next/headers";
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
 import * as Sentry from "@sentry/nextjs";
-import { SessionPayload } from "@/modules/auth/definitions";
 import { SESSION_KEY } from "@/config/env";
+import { randomUUID } from "crypto";
 
-export async function encrypt(payload: SessionPayload) {
-  return new SignJWT(payload)
+// Validate SESSION_KEY on module load
+if (!SESSION_KEY || SESSION_KEY.length < 32) {
+  throw new Error("SESSION_KEY must be at least 32 characters long");
+}
+
+// In-memory blacklist for JTIs (in production, use Redis or database)
+const blacklistedJTIs = new Set<string>();
+
+export function blacklistJTI(jti: string): void {
+  blacklistedJTIs.add(jti);
+}
+
+export function isJTIBlacklisted(jti: string): boolean {
+  return blacklistedJTIs.has(jti);
+}
+
+export function generateTokenId(): string {
+  return randomUUID();
+}
+
+export async function encryptAccessToken(userId: string): Promise<string> {
+  return new SignJWT({ userId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(SESSION_KEY);
+}
+
+export async function encryptRefreshToken(userId: string, jti: string): Promise<string> {
+  return new SignJWT({ userId, jti })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
     .sign(SESSION_KEY);
 }
 
-export async function decrypt(session: string | undefined = "") {
+export async function decryptAccessToken(token: string | undefined): Promise<JWTPayload | undefined> {
+  if (!token) return undefined;
+
   try {
-    const { payload } = await jwtVerify(session, SESSION_KEY, {
+    const { payload } = await jwtVerify(token, SESSION_KEY, {
       algorithms: ["HS256"],
     });
     return payload;
   } catch (error) {
     Sentry.captureException(error);
+    return undefined;
   }
 }
 
-export async function createSession(token: string): Promise<void> {
-  const session = await encrypt({ token });
-  const cookieStore = await cookies();
+export async function decryptRefreshToken(token: string | undefined): Promise<JWTPayload | undefined> {
+  if (!token) return undefined;
 
-  cookieStore.set("session", session, {
+  try {
+    const { payload } = await jwtVerify(token, SESSION_KEY, {
+      algorithms: ["HS256"],
+    });
+
+    // Check if JTI is blacklisted
+    if (payload.jti && isJTIBlacklisted(payload.jti as string)) {
+      return undefined;
+    }
+
+    return payload;
+  } catch (error) {
+    Sentry.captureException(error);
+    return undefined;
+  }
+}
+
+export async function setAccessCookie(token: string): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set("access-token", token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
+    maxAge: 15 * 60,
   });
 }
 
-export async function updateSession() {
-  const session = (await cookies()).get("session")?.value;
-  const payload = await decrypt(session);
-
-  if (!session || !payload) {
-    return null;
-  }
-
+export async function setRefreshCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set("session", session, {
+  cookieStore.set("refresh-token", token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
+    maxAge: 7 * 24 * 60 * 60,
   });
 }
 
-export async function getSession(): Promise<JWTPayload | undefined> {
+export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-
-  if (!session) return;
-
-  return await decrypt(session);
+  cookieStore.delete("access-token");
+  cookieStore.delete("refresh-token");
 }
 
-export async function deleteSession(): Promise<void> {
+export async function getAccessToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  cookieStore.delete("session");
+  return cookieStore.get("access-token")?.value;
+}
+
+export async function getRefreshToken(): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get("refresh-token")?.value;
+}
+
+export async function refreshTokensServerSide(): Promise<boolean> {
+  try {
+    const { serverAuthFetch } = await import("@/modules/auth/utils/server-auth-fetch");
+    const response = await serverAuthFetch("/api/auth/refresh", {
+      method: "POST",
+    });
+    return response.ok;
+  } catch (error) {
+    Sentry.captureException(error);
+    return false;
+  }
 }

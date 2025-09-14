@@ -20,3 +20,12 @@ export type FormState =
 export interface SessionPayload extends JWTPayload {
   token: string;
 }
+
+export interface AccessTokenPayload extends JWTPayload {
+  userId: string;
+}
+
+export interface RefreshTokenPayload extends JWTPayload {
+  userId: string;
+  jti: string;
+}

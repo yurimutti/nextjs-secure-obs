@@ -1,17 +1,29 @@
 import "server-only";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { decrypt } from "@/shared/libs/session";
+import {
+  getAccessToken,
+  decryptAccessToken,
+  refreshTokensServerSide
+} from "@/shared/libs/session";
 
 export const verifySession = cache(async () => {
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
+  let accessToken = await getAccessToken();
+  let payload = await decryptAccessToken(accessToken);
 
-  if (!session?.token) {
-    redirect("/login");
+  if (!payload?.userId) {
+    const refreshSuccess = await refreshTokensServerSide();
+
+    if (refreshSuccess) {
+      accessToken = await getAccessToken();
+      payload = await decryptAccessToken(accessToken);
+    }
+
+    if (!payload?.userId) {
+      redirect("/login");
+    }
   }
 
-  return { isAuth: true };
+  return { isAuth: true, userId: payload.userId };
 });
