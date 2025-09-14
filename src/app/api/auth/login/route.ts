@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { SignJWT } from "jose";
-import { env } from "@/config/env";
-
-const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
+import { JWT_KEY } from "@/config/env";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,15 +16,11 @@ export async function POST(request: NextRequest) {
 
     if (email === "teste@email.com" && password === "123456") {
       const token = await new SignJWT({
-        sub: "1234567890",
-        email: email,
         iat: Math.floor(Date.now() / 1000),
       })
         .setProtectedHeader({ alg: "HS256" })
-        .setExpirationTime("24h")
-        .sign(JWT_SECRET);
-
-      console.log("Generated JWT Token:", token);
+        .setExpirationTime("7d")
+        .sign(JWT_KEY);
 
       return NextResponse.json(
         {
@@ -37,7 +31,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Invalid credentials
     return NextResponse.json(
       { message: "Invalid credentials" },
       { status: 401 }

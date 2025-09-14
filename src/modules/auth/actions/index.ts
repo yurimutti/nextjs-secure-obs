@@ -27,7 +27,6 @@ export async function signin(state: FormState, formData: FormData) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      credentials: "include",
     }
   );
 

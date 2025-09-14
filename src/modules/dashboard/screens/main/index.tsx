@@ -7,9 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifySession } from "@/shared/libs/dal";
-import { authFetchServer } from "@/modules/auth/utils/server";
 import { RecentActivities } from "@/modules/dashboard/components/recent-activities";
 import { SentryErrorTest } from "@/components/sentry-error-test";
+import { serverAuthFetch } from "@/modules/auth/utils/server-auth-fetch";
 
 interface UserProfile {
   name: string | null;
@@ -19,9 +19,9 @@ interface UserProfile {
 
 const getUserProfile = async (): Promise<UserProfile | null> => {
   try {
-    const response = await authFetchServer("/api/user-profile");
+    const response = await serverAuthFetch("/api/user-profile");
 
-    if (!response?.ok) {
+    if (!response.ok) {
       return null;
     }
 

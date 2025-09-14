@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authFetch } from "@/modules/auth/utils";
+
 import type {
   RecentActivitiesResponse,
   RecentActivitiesParams,
 } from "@/modules/dashboard/types/activity";
 import toast from "react-hot-toast";
+import { authFetch } from "@/modules/auth/utils/auth-fetch";
 
 const QUERY_KEYS = {
   recentActivities: (params?: RecentActivitiesParams) =>

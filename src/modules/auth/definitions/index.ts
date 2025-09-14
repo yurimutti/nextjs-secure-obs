@@ -19,5 +19,4 @@ export type FormState =
 
 export interface SessionPayload extends JWTPayload {
   token: string;
-  expiresAt: Date;
 }
