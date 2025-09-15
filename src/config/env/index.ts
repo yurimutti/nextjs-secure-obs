@@ -22,4 +22,6 @@ export const env = createEnv({
 });
 
 export const JWT_KEY: Uint8Array = new TextEncoder().encode(env.JWT_SECRET);
-export const SESSION_KEY: Uint8Array = new TextEncoder().encode(env.SESSION_SECRET);
+export const SESSION_KEY: Uint8Array = new TextEncoder().encode(
+  env.SESSION_SECRET
+);

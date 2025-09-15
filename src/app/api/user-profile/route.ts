@@ -10,6 +10,12 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Simulate server error to demonstrate Sentry error capture
+    const shouldError = Math.random() > 0.7; // 30% chance of error
+    if (shouldError) {
+      throw new Error("Simulated server error - Failed to fetch user profile");
+    }
+
     return NextResponse.json({
       name: "Usuário Teste",
       email: "teste@email.com",
@@ -17,5 +23,9 @@ export async function GET() {
     });
   } catch (error) {
     Sentry.captureException(error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

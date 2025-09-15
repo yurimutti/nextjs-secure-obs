@@ -8,13 +8,13 @@ export const SigninFormSchema = z.object({
 
 export type FormState =
   | {
-    errors?: {
-      name?: string[];
-      email?: string[];
-      password?: string[];
-    };
-    message?: string;
-  }
+      errors?: {
+        name?: string[];
+        email?: string[];
+        password?: string[];
+      };
+      message?: string;
+    }
   | undefined;
 
 export interface SessionPayload extends JWTPayload {

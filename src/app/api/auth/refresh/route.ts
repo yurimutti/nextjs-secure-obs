@@ -39,10 +39,7 @@ export async function POST() {
     await setAccessCookie(newAccessToken);
     await setRefreshCookie(newRefreshToken);
 
-    return NextResponse.json(
-      { message: "ok" },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "ok" }, { status: 200 });
   } catch (error) {
     Sentry.captureException(error);
     return NextResponse.json(

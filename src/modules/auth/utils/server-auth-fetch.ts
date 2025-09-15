@@ -20,7 +20,7 @@ export async function serverAuthFetch(
 
   const cookieHeader = cookieStore
     .getAll()
-    .map(cookie => `${cookie.name}=${cookie.value}`)
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
   const mergedHeaders = new Headers(init?.headers);
@@ -42,7 +42,7 @@ export async function serverAuthFetch(
       cache: "no-store",
       headers: {
         Cookie: cookieHeader,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -50,7 +50,7 @@ export async function serverAuthFetch(
       const updatedCookieStore = await cookies();
       const newCookieHeader = updatedCookieStore
         .getAll()
-        .map(cookie => `${cookie.name}=${cookie.value}`)
+        .map((cookie) => `${cookie.name}=${cookie.value}`)
         .join("; ");
 
       const retryHeaders = new Headers(mergedHeaders);

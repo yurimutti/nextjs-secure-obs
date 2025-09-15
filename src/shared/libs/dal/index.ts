@@ -46,8 +46,8 @@ export async function getValidAccessToken(): Promise<string | null> {
 
     const userId = refreshPayload?.userId;
     const newJti = generateTokenId();
-    const newAccessToken = await encryptAccessToken(userId || '');
-    const newRefreshToken = await encryptRefreshToken(userId || '', newJti);
+    const newAccessToken = await encryptAccessToken(userId || "");
+    const newRefreshToken = await encryptRefreshToken(userId || "", newJti);
 
     await setAccessCookie(newAccessToken);
     await setRefreshCookie(newRefreshToken);

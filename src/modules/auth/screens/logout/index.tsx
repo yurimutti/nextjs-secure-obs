@@ -1,6 +1,12 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
 
 export function LogoutScreen() {
   return (
@@ -14,9 +20,7 @@ export function LogoutScreen() {
         </CardHeader>
         <CardContent>
           <Button asChild className="w-full">
-            <Link href="/login">
-              Back to Login
-            </Link>
+            <Link href="/login">Back to Login</Link>
           </Button>
         </CardContent>
       </Card>

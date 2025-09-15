@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Bug, CheckCircle, AlertTriangle } from 'lucide-react';
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Bug, CheckCircle, AlertTriangle } from "lucide-react";
 
 class DashboardSentryError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'DashboardSentryError';
+    this.name = "DashboardSentryError";
   }
 }
 
@@ -30,7 +30,7 @@ export function SentryErrorTest() {
     async function checkConnectivity() {
       try {
         const result = await Sentry.diagnoseSdkConnectivity();
-        setIsConnected(result !== 'sentry-unreachable');
+        setIsConnected(result !== "sentry-unreachable");
       } catch {
         setIsConnected(false);
       }
@@ -44,19 +44,19 @@ export function SentryErrorTest() {
     try {
       await Sentry.startSpan(
         {
-          name: 'Dashboard Error Test',
-          op: 'test',
+          name: "Dashboard Error Test",
+          op: "test",
         },
         async () => {
           // Simulate some async operation
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
           setHasSentError(true);
         }
       );
 
       // Throw the error after setting state
       throw new DashboardSentryError(
-        'Test error thrown from dashboard - this is expected for Sentry testing'
+        "Test error thrown from dashboard - this is expected for Sentry testing"
       );
     } catch {
       // The error will be caught by Sentry automatically
@@ -66,12 +66,24 @@ export function SentryErrorTest() {
 
   const getConnectionStatus = () => {
     if (isConnected === null) {
-      return { variant: 'secondary' as const, label: 'Checking...', icon: null };
+      return {
+        variant: "secondary" as const,
+        label: "Checking...",
+        icon: null,
+      };
     }
     if (isConnected) {
-      return { variant: 'default' as const, label: 'Connected', icon: CheckCircle };
+      return {
+        variant: "default" as const,
+        label: "Connected",
+        icon: CheckCircle,
+      };
     }
-    return { variant: 'destructive' as const, label: 'Disconnected', icon: AlertTriangle };
+    return {
+      variant: "destructive" as const,
+      label: "Disconnected",
+      icon: AlertTriangle,
+    };
   };
 
   const connectionStatus = getConnectionStatus();
@@ -90,7 +102,10 @@ export function SentryErrorTest() {
               Test error reporting integration with your Sentry dashboard
             </CardDescription>
           </div>
-          <Badge variant={connectionStatus.variant} className="flex items-center gap-1">
+          <Badge
+            variant={connectionStatus.variant}
+            className="flex items-center gap-1"
+          >
             {StatusIcon && <StatusIcon className="h-3 w-3" />}
             {connectionStatus.label}
           </Badge>
@@ -99,8 +114,9 @@ export function SentryErrorTest() {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
-            Click the button below to throw a test error that will be captured by Sentry.
-            This helps verify your error monitoring is working correctly.
+            Click the button below to throw a test error that will be captured
+            by Sentry. This helps verify your error monitoring is working
+            correctly.
           </p>
 
           <Button
@@ -110,7 +126,7 @@ export function SentryErrorTest() {
             className="w-full"
           >
             <Bug className="h-4 w-4 mr-2" />
-            {isLoading ? 'Throwing Error...' : 'Throw Test Error'}
+            {isLoading ? "Throwing Error..." : "Throw Test Error"}
           </Button>
         </div>
 
@@ -118,7 +134,7 @@ export function SentryErrorTest() {
           <Alert className="border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              Test error sent to Sentry successfully. Check your{' '}
+              Test error sent to Sentry successfully. Check your{" "}
               <a
                 href="https://sentry.io"
                 target="_blank"
@@ -126,7 +142,7 @@ export function SentryErrorTest() {
                 className="underline font-medium hover:text-green-900"
               >
                 Sentry Dashboard
-              </a>{' '}
+              </a>{" "}
               to view the error.
             </AlertDescription>
           </Alert>

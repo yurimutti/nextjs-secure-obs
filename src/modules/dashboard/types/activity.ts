@@ -3,7 +3,7 @@ export interface Activity {
   action: string;
   timestamp: string;
   details: string;
-  status: 'success' | 'warning' | 'error';
+  status: "success" | "warning" | "error";
   user?: string;
 }
 

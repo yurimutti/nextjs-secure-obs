@@ -43,12 +43,7 @@ export function LoginScreen() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-              />
+              <Input id="password" name="password" type="password" required />
             </div>
             {state?.errors?.password && (
               <p className="text-red-500 text-sm">{state.errors.password}</p>

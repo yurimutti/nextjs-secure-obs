@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,12 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Search, Menu, Settings, User, LogOut } from 'lucide-react';
-import Link from 'next/link';
-import { logout } from '@/modules/auth/actions';
-
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Search, Menu, Settings, User, LogOut } from "lucide-react";
+import Link from "next/link";
+import { logout } from "@/modules/auth/actions";
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -41,14 +40,17 @@ export function Header({ children }: HeaderProps) {
               </SheetTrigger>
               <SheetContent side="left" className="w-80 pr-0">
                 <div className="px-3">
-                  <Link href="/dashboard" className="flex items-center space-x-2 pb-4">
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center space-x-2 pb-4"
+                  >
                     <span className="font-bold text-lg">Secure Dashboard</span>
                   </Link>
                   {children}
                 </div>
               </SheetContent>
             </Sheet>
-            
+
             <Link href="/dashboard" className="flex items-center space-x-2">
               <span className="font-bold text-lg sm:text-xl">
                 Secure Dashboard
@@ -68,16 +70,19 @@ export function Header({ children }: HeaderProps) {
                 />
               </div>
             </div>
-            
+
             {/* Mobile Search Button */}
             <Button variant="ghost" size="sm" className="sm:hidden">
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
             </Button>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-9 w-9 rounded-full"
+                >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatars/01.png" alt="@johndoe" />
                     <AvatarFallback>JD</AvatarFallback>
@@ -105,7 +110,10 @@ export function Header({ children }: HeaderProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="p-0">
                   <form action={logout} className="w-full">
-                    <button type="submit" className="flex w-full items-center px-2 py-1.5 text-sm">
+                    <button
+                      type="submit"
+                      className="flex w-full items-center px-2 py-1.5 text-sm"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </button>
