@@ -1,29 +1,44 @@
 import "server-only";
-
-import { redirect } from "next/navigation";
 import { cache } from "react";
-import {
-  getAccessToken,
-  decryptAccessToken,
-  refreshTokensServerSide
-} from "@/shared/libs/session";
+import { getAccessToken, decryptAccessToken } from "@/shared/libs/session";
+import * as Sentry from "@sentry/nextjs";
+import { serverAuthFetch } from "@/modules/auth";
+
+interface UserProfile {
+  name: string | null;
+  email: string | null;
+  memberSince: string | null;
+}
 
 export const verifySession = cache(async () => {
-  let accessToken = await getAccessToken();
-  let payload = await decryptAccessToken(accessToken);
+  const accessToken = await getAccessToken();
+  const payload = await decryptAccessToken(accessToken);
 
-  if (!payload?.userId) {
-    const refreshSuccess = await refreshTokensServerSide();
-
-    if (refreshSuccess) {
-      accessToken = await getAccessToken();
-      payload = await decryptAccessToken(accessToken);
-    }
-
-    if (!payload?.userId) {
-      redirect("/login");
-    }
+  if (payload?.userId) {
+    return { isAuth: true, userId: payload.userId };
   }
-
-  return { isAuth: true, userId: payload.userId };
 });
+
+export const getUserProfile = async (): Promise<UserProfile | null> => {
+  const session = await verifySession();
+  if (!session) return null;
+
+  try {
+    const response = await serverAuthFetch("/api/user-profile");
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+
+    return {
+      name: data.name || null,
+      email: data.email || null,
+      memberSince: data.memberSince || null,
+    };
+  } catch (error) {
+    Sentry.captureException(error);
+    return null;
+  }
+};

@@ -5,12 +5,10 @@ import * as Sentry from "@sentry/nextjs";
 import { SESSION_KEY } from "@/config/env";
 import { randomUUID } from "crypto";
 
-// Validate SESSION_KEY on module load
 if (!SESSION_KEY || SESSION_KEY.length < 32) {
-  throw new Error("SESSION_KEY must be at least 32 characters long");
+  throw new Error("SESSION_KEY must be at least 256 bits (32 bytes) long");
 }
 
-// In-memory blacklist for JTIs (in production, use Redis or database)
 const blacklistedJTIs = new Set<string>();
 
 export function blacklistJTI(jti: string): void {
@@ -33,7 +31,10 @@ export async function encryptAccessToken(userId: string): Promise<string> {
     .sign(SESSION_KEY);
 }
 
-export async function encryptRefreshToken(userId: string, jti: string): Promise<string> {
+export async function encryptRefreshToken(
+  userId: string,
+  jti: string
+): Promise<string> {
   return new SignJWT({ userId, jti })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -41,7 +42,9 @@ export async function encryptRefreshToken(userId: string, jti: string): Promise<
     .sign(SESSION_KEY);
 }
 
-export async function decryptAccessToken(token: string | undefined): Promise<JWTPayload | undefined> {
+export async function decryptAccessToken(
+  token: string | undefined
+): Promise<JWTPayload | undefined> {
   if (!token) return undefined;
 
   try {
@@ -55,7 +58,9 @@ export async function decryptAccessToken(token: string | undefined): Promise<JWT
   }
 }
 
-export async function decryptRefreshToken(token: string | undefined): Promise<JWTPayload | undefined> {
+export async function decryptRefreshToken(
+  token: string | undefined
+): Promise<JWTPayload | undefined> {
   if (!token) return undefined;
 
   try {
@@ -63,7 +68,7 @@ export async function decryptRefreshToken(token: string | undefined): Promise<JW
       algorithms: ["HS256"],
     });
 
-    // Check if JTI is blacklisted
+
     if (payload.jti && isJTIBlacklisted(payload.jti as string)) {
       return undefined;
     }
@@ -90,9 +95,9 @@ export async function setRefreshCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set("refresh-token", token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: "/",
+    path: "/api/auth/refresh",
     maxAge: 7 * 24 * 60 * 60,
   });
 }
@@ -115,7 +120,9 @@ export async function getRefreshToken(): Promise<string | undefined> {
 
 export async function refreshTokensServerSide(): Promise<boolean> {
   try {
-    const { serverAuthFetch } = await import("@/modules/auth/utils/server-auth-fetch");
+    const { serverAuthFetch } = await import(
+      "@/modules/auth/utils/server-auth-fetch"
+    );
     const response = await serverAuthFetch("/api/auth/refresh", {
       method: "POST",
     });

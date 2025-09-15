@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
 import {
   Card,
   CardContent,
@@ -6,41 +5,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { verifySession } from "@/shared/libs/dal";
+import { getUserProfile } from "@/shared/libs/dal";
 import { RecentActivities } from "@/modules/dashboard/components/recent-activities";
 import { SentryErrorTest } from "@/components/sentry-error-test";
-import { serverAuthFetch } from "@/modules/auth/utils/server-auth-fetch";
-
-interface UserProfile {
-  name: string | null;
-  email: string | null;
-  memberSince: string | null;
-}
-
-const getUserProfile = async (): Promise<UserProfile | null> => {
-  try {
-    const response = await serverAuthFetch("/api/user-profile");
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-
-    return {
-      name: data.name || null,
-      email: data.email || null,
-      memberSince: data.memberSince || null,
-    };
-  } catch (error) {
-    Sentry.captureException(error);
-    return null;
-  }
-};
 
 export async function DashboardScreen() {
-  await verifySession();
-
   const userProfile = await getUserProfile();
 
   return (

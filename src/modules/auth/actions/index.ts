@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { redirect } from "next/navigation";
 import { FormState, SigninFormSchema } from "../definitions";
 import { env } from "@/config/env";
@@ -53,7 +54,7 @@ export async function logout() {
       credentials: "include",
     });
   } catch (error) {
-    // Continue with local cleanup even if API fails
+    Sentry.captureException(error);
     console.error("Logout API call failed:", error);
   }
 
