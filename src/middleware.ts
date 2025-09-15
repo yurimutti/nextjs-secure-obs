@@ -15,12 +15,10 @@ export default async function middleware(req: NextRequest) {
 
   const payload = await decryptAccessToken(accessToken);
 
-  // Redirect unauthenticated users away from protected routes
   if (isProtectedRoute && !payload?.userId) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
-  // Redirect authenticated users away from login page to dashboard
   if (isPublicRoute && payload?.userId && path === "/login") {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
