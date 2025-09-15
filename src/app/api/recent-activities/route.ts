@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureSession } from "@/shared/libs/dal";
 import * as Sentry from "@sentry/nextjs";
+import type { Activity } from "./types";
 
-type Activity = {
-  id: string;
-  action: string;
-  timestamp: string;
-  details: string;
-  status: "success" | "warning" | "error";
-  user?: string;
-};
+// Local constants for mock data generation
+const MOCK_ACTIVITIES_COUNT = 20;
 
 const generateMockActivities = (): Activity[] => {
   const actions = [
@@ -29,7 +24,7 @@ const generateMockActivities = (): Activity[] => {
     "error",
   ];
 
-  return Array.from({ length: 20 }, (_, i) => ({
+  return Array.from({ length: MOCK_ACTIVITIES_COUNT }, (_, i) => ({
     id: `${i + 1}`,
     action: actions[Math.floor(Math.random() * actions.length)],
     timestamp: new Date(

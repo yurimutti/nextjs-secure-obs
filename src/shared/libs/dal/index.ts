@@ -16,18 +16,7 @@ import {
 import * as Sentry from "@sentry/nextjs";
 import { serverAuthFetch } from "@/modules/auth";
 import { redirect } from "next/navigation";
-
-interface UserProfile {
-  name: string | null;
-  email: string | null;
-  memberSince: string | null;
-}
-
-interface SessionData {
-  isAuth: true;
-  userId: string;
-  email?: string;
-}
+import type { UserProfile, SessionData } from "@/shared/types";
 
 export async function getValidAccessToken(): Promise<string | null> {
   try {

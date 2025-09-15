@@ -6,16 +6,21 @@ import type {
 } from "@/modules/dashboard/types/activity";
 import toast from "react-hot-toast";
 import { authFetch } from "@/modules/auth/utils/auth-fetch";
-
-const QUERY_KEYS = {
-  recentActivities: (params?: RecentActivitiesParams) =>
-    ["recent-activities", params] as const,
-} as const;
+import {
+  QUERY_KEYS,
+  QUERY_STALE_TIME,
+  QUERY_GC_TIME,
+  DEFAULT_ACTIVITIES_LIMIT,
+  DEFAULT_ACTIVITIES_OFFSET,
+} from "../constants";
 
 async function fetchRecentActivities(
   params: RecentActivitiesParams = {}
 ): Promise<RecentActivitiesResponse> {
-  const { limit = 8, offset = 0 } = params;
+  const {
+    limit = DEFAULT_ACTIVITIES_LIMIT,
+    offset = DEFAULT_ACTIVITIES_OFFSET,
+  } = params;
 
   const searchParams = new URLSearchParams({
     limit: limit.toString(),
@@ -41,8 +46,8 @@ export function useRecentActivities(params: RecentActivitiesParams = {}) {
   return useQuery({
     queryKey: QUERY_KEYS.recentActivities(params),
     queryFn: () => fetchRecentActivities(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: QUERY_STALE_TIME,
+    gcTime: QUERY_GC_TIME,
   });
 }
 

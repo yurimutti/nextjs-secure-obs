@@ -1,14 +1,15 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { JWTPayload, SignJWT, jwtVerify } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 import * as Sentry from "@sentry/nextjs";
 import { SESSION_KEY } from "@/config/env";
-
-interface TokenPayload extends JWTPayload {
-  userId: string;
-  email?: string;
-  jti?: string;
-}
+import {
+  ACCESS_TOKEN_DURATION,
+  REFRESH_TOKEN_DURATION,
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/shared/constants";
+import type { TokenPayload } from "@/shared/types";
 
 if (!SESSION_KEY || SESSION_KEY.length < 32) {
   Sentry.captureException(new Error("Invalid SESSION_KEY"));
@@ -23,7 +24,7 @@ export async function encryptAccessToken(userId: string): Promise<string> {
   return new SignJWT({ userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("15m")
+    .setExpirationTime(ACCESS_TOKEN_DURATION)
     .sign(SESSION_KEY);
 }
 
@@ -34,7 +35,7 @@ export async function encryptRefreshToken(
   return new SignJWT({ userId, jti })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime(REFRESH_TOKEN_DURATION)
     .sign(SESSION_KEY);
 }
 
@@ -72,7 +73,7 @@ export async function decryptRefreshToken(
 
 export async function setAccessCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set("access-token", token, {
+  cookieStore.set(ACCESS_TOKEN_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -83,7 +84,7 @@ export async function setAccessCookie(token: string): Promise<void> {
 
 export async function setRefreshCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set("refresh-token", token, {
+  cookieStore.set(REFRESH_TOKEN_COOKIE, token, {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
@@ -94,18 +95,18 @@ export async function setRefreshCookie(token: string): Promise<void> {
 
 export async function clearAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete("access-token");
-  cookieStore.delete("refresh-token");
+  cookieStore.delete(ACCESS_TOKEN_COOKIE);
+  cookieStore.delete(REFRESH_TOKEN_COOKIE);
 }
 
 export async function getAccessToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  return cookieStore.get("access-token")?.value;
+  return cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 }
 
 export async function getRefreshToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  return cookieStore.get("refresh-token")?.value;
+  return cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
 }
 
 export async function refreshTokensServerSide(): Promise<boolean> {

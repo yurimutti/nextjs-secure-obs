@@ -1,16 +1,16 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
-const BASE_URL_DEFAULT = "http://localhost:3000";
+const DEFAULT_BASE_URL = "http://localhost:3000";
 
 export const env = createEnv({
   server: {
     JWT_SECRET: z.string().min(32, "JWT_SECRET must be ≥ 32 chars"),
     SESSION_SECRET: z.string().min(32, "SESSION_SECRET must be ≥ 32 chars"),
-    API_BASE_URL: z.string().url().default(BASE_URL_DEFAULT),
+    API_BASE_URL: z.string().url().default(DEFAULT_BASE_URL),
   },
   client: {
-    NEXT_PUBLIC_API_BASE_URL: z.string().url().default(BASE_URL_DEFAULT),
+    NEXT_PUBLIC_API_BASE_URL: z.string().url().default(DEFAULT_BASE_URL),
   },
   runtimeEnv: {
     JWT_SECRET: process.env.JWT_SECRET,

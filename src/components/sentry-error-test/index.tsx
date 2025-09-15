@@ -48,18 +48,15 @@ export function SentryErrorTest() {
           op: "test",
         },
         async () => {
-          // Simulate some async operation
           await new Promise((resolve) => setTimeout(resolve, 500));
           setHasSentError(true);
         }
       );
 
-      // Throw the error after setting state
       throw new DashboardSentryError(
         "Test error thrown from dashboard - this is expected for Sentry testing"
       );
     } catch {
-      // The error will be caught by Sentry automatically
       setIsLoading(false);
     }
   };
