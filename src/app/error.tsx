@@ -16,7 +16,6 @@ export default function Error({ error, reset }: ErrorProps) {
   const router = useRouter();
 
   useEffect(() => {
-    // Capture the error in Sentry with rich context
     Sentry.captureException(error, {
       tags: {
         component: "error-boundary",
@@ -26,16 +25,15 @@ export default function Error({ error, reset }: ErrorProps) {
         digest: error.digest,
         errorMessage: error.message,
         errorStack: error.stack,
-        userAgent: typeof window !== "undefined" ? window.navigator.userAgent : undefined,
+        userAgent:
+          typeof window !== "undefined"
+            ? window.navigator.userAgent
+            : undefined,
         url: typeof window !== "undefined" ? window.location.href : undefined,
       },
       level: "error",
     });
 
-    // Also log to console for development
-    console.error("Application error:", error);
-
-    // Add breadcrumb for user actions leading to error
     Sentry.addBreadcrumb({
       message: "Application error boundary triggered",
       category: "error",
@@ -56,8 +54,8 @@ export default function Error({ error, reset }: ErrorProps) {
             Something went wrong!
           </h1>
           <p className="text-muted-foreground">
-            An unexpected error occurred. We&apos;ve been notified and are working on
-            a fix.
+            An unexpected error occurred. We&apos;ve been notified and are
+            working on a fix.
           </p>
         </div>
 

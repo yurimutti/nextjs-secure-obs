@@ -53,8 +53,15 @@ export async function logout() {
       credentials: "include",
     });
   } catch (error) {
-    Sentry.captureException(error);
-    console.error("Logout API call failed:", error);
+    Sentry.captureException(error, {
+      tags: {
+        component: "auth-actions",
+        action: "logout",
+      },
+      extra: {
+        apiUrl: `${env.API_BASE_URL}/api/auth/logout`,
+      },
+    });
   }
 
   await clearAuthCookies();

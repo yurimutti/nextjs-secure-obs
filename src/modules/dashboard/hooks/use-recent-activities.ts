@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as Sentry from "@sentry/nextjs";
 
 import type {
   RecentActivitiesResponse,
   RecentActivitiesParams,
 } from "@/modules/dashboard/types/activity";
 import toast from "react-hot-toast";
+
 import { authFetch } from "@/modules/auth/utils/auth-fetch";
+
 import {
   QUERY_KEYS,
   QUERY_STALE_TIME,
@@ -29,15 +32,27 @@ async function fetchRecentActivities(
 
   const response = await authFetch(`/api/recent-activities?${searchParams}`);
 
-  if (!response.ok) {
-    const error = new Error("Failed to fetch recent activities") as Error & {
-      status: number;
-    };
-    error.status = response.status;
-    toast.error(`Error ${response.status}: ${response.statusText}`);
+  // TODO: improve this error handling
+  // if (!response.ok) {
+  //   const error = new Error("Failed to fetch recent activities") as Error & {
+  //     status: number;
+  //   };
+  //   error.status = response.status;
 
-    throw error;
-  }
+  //   toast.error(`Error ${response.status}: ${response.statusText}`);
+
+  //   Sentry.captureException(error, {
+  //     tags: {
+  //       component: "dashboard-hooks",
+  //       hook: "useRecentActivities",
+  //     },
+  //     extra: {
+  //       action: "fetch_recent_activities",
+  //     },
+  //   });
+
+  //   throw error;
+  // }
 
   return response.json();
 }
@@ -62,7 +77,15 @@ export function useRefreshActivities() {
       queryClient.setQueryData(QUERY_KEYS.recentActivities(variables), data);
     },
     onError: (error) => {
-      console.error("Failed to refresh activities:", error);
+      Sentry.captureException(error, {
+        tags: {
+          component: "dashboard-hooks",
+          hook: "useRefreshActivities",
+        },
+        extra: {
+          action: "refresh_activities_mutation",
+        },
+      });
     },
   });
 }

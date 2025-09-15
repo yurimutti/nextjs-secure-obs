@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
+import * as Sentry from "@sentry/nextjs";
 import {
   useRecentActivities,
   useRefreshActivities,
@@ -61,7 +62,15 @@ export function RecentActivities() {
     try {
       await refreshMutation.mutateAsync({ limit: 8 });
     } catch (error) {
-      console.error("Error refreshing activities:", error);
+      Sentry.captureException(error, {
+        tags: {
+          component: "recent-activities",
+          action: "refresh",
+        },
+        extra: {
+          limit: 8,
+        },
+      });
     }
   };
 
