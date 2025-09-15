@@ -5,6 +5,7 @@ import type { Activity } from "./types";
 
 // Local constants for mock data generation
 const MOCK_ACTIVITIES_COUNT = 20;
+const ERROR_SIMULATION_THRESHOLD = 0.7; // 30% chance of error
 
 const generateMockActivities = (): Activity[] => {
   const actions = [
@@ -40,7 +41,37 @@ const generateMockActivities = (): Activity[] => {
 
 export async function GET(request: NextRequest) {
   try {
-    await ensureSession();
+    const session = await ensureSession();
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    Sentry.setUser({
+      id: session.userId,
+      email: session.email
+    });
+
+    // Simulate server error to demonstrate Sentry error capture
+    const shouldError = Math.random() > ERROR_SIMULATION_THRESHOLD;
+    if (shouldError) {
+      const simulatedError = new Error("Failed to fetch activities from database - Connection timeout");
+      simulatedError.name = "DatabaseTimeoutError";
+
+      Sentry.captureException(simulatedError, {
+        tags: {
+          component: "api",
+          route: "recent-activities",
+          error_type: "simulated"
+        },
+        extra: {
+          userId: session.userId,
+          simulationThreshold: ERROR_SIMULATION_THRESHOLD,
+          wasTriggered: true
+        }
+      });
+
+      throw simulatedError;
+    }
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "10");
@@ -55,7 +86,17 @@ export async function GET(request: NextRequest) {
       hasMore: offset + limit < activities.length,
     });
   } catch (error) {
-    Sentry.captureException(error);
+    Sentry.captureException(error, {
+      tags: {
+        component: "api",
+        route: "recent-activities"
+      },
+      extra: {
+        method: request.method,
+        url: request.url,
+        errorMessage: error instanceof Error ? error.message : String(error)
+      }
+    });
     return NextResponse.json(
       { error: "Failed to fetch recent activities" },
       { status: 500 }

@@ -67,7 +67,12 @@ export const verifySession = cache(async (): Promise<SessionData | null> => {
   }
 });
 
-export async function ensureSession(): Promise<SessionData> {
+export async function ensureSession(): Promise<SessionData | null> {
+  const session = await verifySession();
+  return session;
+}
+
+export async function requireSession(): Promise<SessionData> {
   const session = await verifySession();
   if (!session) {
     redirect("/login");

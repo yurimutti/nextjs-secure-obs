@@ -1,13 +1,13 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { ensureSession } from "@/shared/libs/dal";
+import { requireSession } from "@/shared/libs/dal";
 
 export default async function PrivateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await ensureSession();
+  await requireSession();
 
   return (
     <div className="min-h-screen bg-background">

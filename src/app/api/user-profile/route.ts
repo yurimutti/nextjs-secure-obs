@@ -2,9 +2,6 @@ import { ensureSession } from "@/shared/libs/dal";
 import { NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 
-// Local constant for error simulation
-const ERROR_SIMULATION_THRESHOLD = 0.7; // 30% chance of error
-
 export async function GET(request: NextRequest) {
   try {
     Sentry.addBreadcrumb({
@@ -28,27 +25,6 @@ export async function GET(request: NextRequest) {
       id: session.userId,
       email: session.email,
     });
-
-    // Simulate server error to demonstrate Sentry error capture
-    const shouldError = Math.random() > ERROR_SIMULATION_THRESHOLD;
-    if (shouldError) {
-      const simulatedError = new Error("Simulated server error - Failed to fetch user profile");
-
-      Sentry.captureException(simulatedError, {
-        tags: {
-          component: "api",
-          route: "user-profile",
-          error_type: "simulated",
-        },
-        extra: {
-          userId: session.userId,
-          simulationThreshold: ERROR_SIMULATION_THRESHOLD,
-          wasTriggered: true,
-        },
-      });
-
-      throw simulatedError;
-    }
 
     Sentry.addBreadcrumb({
       message: "Successfully retrieved user profile",

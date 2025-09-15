@@ -25,7 +25,6 @@ export function Header({ children }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="px-3">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo and Mobile Menu */}
           <div className="flex items-center">
             <Sheet>
               <SheetTrigger asChild>
@@ -58,7 +57,6 @@ export function Header({ children }: HeaderProps) {
             </Link>
           </div>
 
-          {/* Search and User Menu */}
           <div className="flex items-center space-x-4">
             <div className="hidden sm:block">
               <div className="relative">
@@ -71,7 +69,6 @@ export function Header({ children }: HeaderProps) {
               </div>
             </div>
 
-            {/* Mobile Search Button */}
             <Button variant="ghost" size="sm" className="sm:hidden">
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>

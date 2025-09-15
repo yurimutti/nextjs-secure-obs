@@ -3,12 +3,14 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import * as Sentry from "@sentry/nextjs";
 import { SESSION_KEY } from "@/config/env";
+
 import {
   ACCESS_TOKEN_DURATION,
   REFRESH_TOKEN_DURATION,
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/shared/constants";
+
 import type { TokenPayload } from "@/shared/types";
 
 if (!SESSION_KEY || SESSION_KEY.length < 32) {
@@ -73,22 +75,32 @@ export async function decryptRefreshToken(
 
 export async function setAccessCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
+
+  const payload = await decryptAccessToken(token);
+  const expiresAt = payload?.exp ? new Date(payload.exp * 1000) : undefined;
+
   cookieStore.set(ACCESS_TOKEN_COOKIE, token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
+    expires: expiresAt,
     maxAge: 15 * 60,
   });
 }
 
 export async function setRefreshCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
+
+  const payload = await decryptRefreshToken(token);
+  const expiresAt = payload?.exp ? new Date(payload.exp * 1000) : undefined;
+
   cookieStore.set(REFRESH_TOKEN_COOKIE, token, {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: "/",
+    path: "/api/auth/refresh",
+    expires: expiresAt,
     maxAge: 7 * 24 * 60 * 60,
   });
 }
