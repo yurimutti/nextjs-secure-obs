@@ -3,24 +3,20 @@ import { cookies } from "next/headers";
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
 import * as Sentry from "@sentry/nextjs";
 import { SESSION_KEY } from "@/config/env";
-import { randomUUID } from "crypto";
+
+interface TokenPayload extends JWTPayload {
+  userId: string;
+  email?: string;
+  jti?: string;
+}
 
 if (!SESSION_KEY || SESSION_KEY.length < 32) {
+  Sentry.captureException(new Error("Invalid SESSION_KEY"));
   throw new Error("SESSION_KEY must be at least 256 bits (32 bytes) long");
 }
 
-const blacklistedJTIs = new Set<string>();
-
-export function blacklistJTI(jti: string): void {
-  blacklistedJTIs.add(jti);
-}
-
-export function isJTIBlacklisted(jti: string): boolean {
-  return blacklistedJTIs.has(jti);
-}
-
 export function generateTokenId(): string {
-  return randomUUID();
+  return crypto.randomUUID();
 }
 
 export async function encryptAccessToken(userId: string): Promise<string> {
@@ -44,11 +40,11 @@ export async function encryptRefreshToken(
 
 export async function decryptAccessToken(
   token: string | undefined
-): Promise<JWTPayload | undefined> {
+): Promise<TokenPayload | undefined> {
   if (!token) return undefined;
 
   try {
-    const { payload } = await jwtVerify(token, SESSION_KEY, {
+    const { payload } = await jwtVerify<TokenPayload>(token, SESSION_KEY, {
       algorithms: ["HS256"],
     });
     return payload;
@@ -60,19 +56,13 @@ export async function decryptAccessToken(
 
 export async function decryptRefreshToken(
   token: string | undefined
-): Promise<JWTPayload | undefined> {
+): Promise<TokenPayload | undefined> {
   if (!token) return undefined;
 
   try {
-    const { payload } = await jwtVerify(token, SESSION_KEY, {
+    const { payload } = await jwtVerify<TokenPayload>(token, SESSION_KEY, {
       algorithms: ["HS256"],
     });
-
-
-    if (payload.jti && isJTIBlacklisted(payload.jti as string)) {
-      return undefined;
-    }
-
     return payload;
   } catch (error) {
     Sentry.captureException(error);
@@ -97,7 +87,7 @@ export async function setRefreshCookie(token: string): Promise<void> {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: "/api/auth/refresh",
+    path: "/",
     maxAge: 7 * 24 * 60 * 60,
   });
 }

@@ -24,6 +24,16 @@ import {
   useRefreshActivities,
 } from "@/modules/dashboard/hooks/use-recent-activities";
 
+const formatTimestamp = (timestamp: string) => {
+  return new Date(timestamp).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const statusConfig = {
   success: {
     label: "Sucesso",
@@ -50,17 +60,9 @@ export function RecentActivities() {
   const handleRefresh = async () => {
     try {
       await refreshMutation.mutateAsync({ limit: 8 });
-    } catch {}
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    } catch (error) {
+      console.error("Error refreshing activities:", error);
+    }
   };
 
   if (isLoading) {

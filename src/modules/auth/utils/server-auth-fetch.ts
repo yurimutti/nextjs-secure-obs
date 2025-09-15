@@ -42,18 +42,23 @@ export async function serverAuthFetch(
       cache: "no-store",
       headers: {
         Cookie: cookieHeader,
+        'Content-Type': 'application/json',
       },
     });
 
     if (refreshResponse.ok) {
-      const refreshCookies = refreshResponse.headers.get("set-cookie");
-      if (refreshCookies) {
-        mergedHeaders.set("Cookie", refreshCookies);
-      }
+      const updatedCookieStore = await cookies();
+      const newCookieHeader = updatedCookieStore
+        .getAll()
+        .map(cookie => `${cookie.name}=${cookie.value}`)
+        .join("; ");
+
+      const retryHeaders = new Headers(mergedHeaders);
+      retryHeaders.set("Cookie", newCookieHeader);
 
       const retryResponse = await fetch(url, {
         ...requestInit,
-        headers: mergedHeaders,
+        headers: retryHeaders,
       });
 
       if (retryResponse.status === 401) {

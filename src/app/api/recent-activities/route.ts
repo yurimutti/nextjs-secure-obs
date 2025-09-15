@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySession } from '@/shared/libs/dal';
+import { ensureSession } from '@/shared/libs/dal';
 import * as Sentry from '@sentry/nextjs'
 
 type Activity = {
@@ -37,7 +37,7 @@ const generateMockActivities = (): Activity[] => {
 
 export async function GET(request: NextRequest) {
   try {
-    await verifySession();
+    await ensureSession();
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');

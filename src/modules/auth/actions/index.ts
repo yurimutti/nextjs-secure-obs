@@ -47,7 +47,6 @@ export async function signin(state: FormState, formData: FormData) {
 }
 
 export async function logout() {
-  // Call logout API to blacklist refresh token
   try {
     await fetch(`${env.API_BASE_URL}/api/auth/logout`, {
       method: "POST",

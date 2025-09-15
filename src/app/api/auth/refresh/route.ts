@@ -8,7 +8,6 @@ import {
   generateTokenId,
   setAccessCookie,
   setRefreshCookie,
-  blacklistJTI,
 } from "@/shared/libs/session";
 
 export async function POST() {
@@ -32,11 +31,6 @@ export async function POST() {
     }
 
     const userId = refreshPayload.userId as string;
-    const oldJti = refreshPayload.jti as string;
-
-    // Blacklist the old refresh token to prevent reuse
-    blacklistJTI(oldJti);
-
     const newJti = generateTokenId();
 
     const newAccessToken = await encryptAccessToken(userId);
@@ -46,9 +40,7 @@ export async function POST() {
     await setRefreshCookie(newRefreshToken);
 
     return NextResponse.json(
-      {
-        message: "ok",
-      },
+      { message: "ok" },
       { status: 200 }
     );
   } catch (error) {
