@@ -22,8 +22,12 @@ export function generateTokenId(): string {
   return crypto.randomUUID();
 }
 
-export async function encryptAccessToken(userId: string): Promise<string> {
-  return new SignJWT({ userId })
+export async function encryptAccessToken(
+  userId: string
+): Promise<string> {
+  const payload = { userId };
+
+  return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(ACCESS_TOKEN_DURATION)
@@ -133,5 +137,27 @@ export async function refreshTokensServerSide(): Promise<boolean> {
   } catch (error) {
     Sentry.captureException(error);
     return false;
+  }
+}
+
+export async function updateSessionWithProfile(
+  userId: string
+): Promise<void> {
+  try {
+    const refreshToken = await getRefreshToken();
+    if (!refreshToken) {
+      return;
+    }
+
+    const refreshPayload = await decryptRefreshToken(refreshToken);
+    const jti = refreshPayload?.jti || generateTokenId();
+
+    const newAccessToken = await encryptAccessToken(userId);
+    const newRefreshToken = await encryptRefreshToken(userId, jti);
+
+    await setAccessCookie(newAccessToken);
+    await setRefreshCookie(newRefreshToken);
+  } catch (error) {
+    Sentry.captureException(error);
   }
 }

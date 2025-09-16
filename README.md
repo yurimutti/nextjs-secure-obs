@@ -18,8 +18,6 @@
 
 </div>
 
----
-
 ## 🇧🇷 Sobre o Projeto
 
 Este projeto demonstra a construção de uma aplicação web segura e observável utilizando Next.js 15, com autenticação baseada em cookies HttpOnly, dashboard protegido via SSR e integração completa com Sentry para monitoramento de erros e performance. O foco está em padrões de segurança enterprise e arquitetura bem documentada através de RFCs e ADRs.

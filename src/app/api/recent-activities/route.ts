@@ -5,7 +5,7 @@ import type { Activity } from "./types";
 
 // Local constants for mock data generation
 const MOCK_ACTIVITIES_COUNT = 20;
-const ERROR_SIMULATION_THRESHOLD = 0.7; // 30% chance of error
+const ERROR_SIMULATION_THRESHOLD = 0.9; // 10% chance of error
 
 const generateMockActivities = (): Activity[] => {
   const actions = [

@@ -59,7 +59,6 @@ export const verifySession = cache(async (): Promise<SessionData | null> => {
     return {
       isAuth: true,
       userId: payload.userId,
-      email: payload.email,
     };
   } catch (error) {
     Sentry.captureException(error);
@@ -80,7 +79,7 @@ export async function requireSession(): Promise<SessionData> {
   return session;
 }
 
-export const getUserProfile = async (): Promise<UserProfile | null> => {
+export const getUserProfile = cache(async (): Promise<UserProfile | null> => {
   const session = await ensureSession();
   if (!session) return null;
 
@@ -93,13 +92,15 @@ export const getUserProfile = async (): Promise<UserProfile | null> => {
 
     const data = await response.json();
 
-    return {
+    const profile = {
       name: data.name || null,
       email: data.email || null,
       memberSince: data.memberSince || null,
     };
+
+    return profile;
   } catch (error) {
     Sentry.captureException(error);
     return null;
   }
-};
+});

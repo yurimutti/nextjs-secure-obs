@@ -165,17 +165,17 @@ export function RecentActivities() {
             </p>
           </div>
         ) : (
-          <Table role="table" aria-label="Recent user activities">
-            <TableHeader role="rowgroup">
-              <TableRow role="row">
-                <TableHead role="columnheader">Ação</TableHead>
-                <TableHead role="columnheader">Status</TableHead>
-                <TableHead role="columnheader">Data/Hora</TableHead>
+          <Table aria-label="Recent user activities">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ação</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Data/Hora</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody role="rowgroup">
+            <TableBody>
               {activities.map((activity) => (
-                <TableRow key={activity.id} className="hover:bg-muted/50" role="row">
+                <TableRow key={activity.id} className="hover:bg-muted/50">
                   <TableCell>
                     <div className="space-y-1">
                       <p className="font-medium text-sm">{activity.action}</p>
