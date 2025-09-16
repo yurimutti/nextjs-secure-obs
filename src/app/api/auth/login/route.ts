@@ -8,50 +8,10 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    // Add request context to Sentry
-    Sentry.setContext("api_request", {
-      url: request.url,
-      method: request.method,
-      userAgent: request.headers.get("user-agent"),
-      ip:
-        request.headers.get("x-forwarded-for") ||
-        request.headers.get("x-real-ip"),
-    });
-
-    Sentry.addBreadcrumb({
-      message: "Processing login request",
-      category: "auth",
-      level: "info",
-    });
-
-    let body;
-    try {
-      body = await request.json();
-    } catch (parseError) {
-      Sentry.captureMessage("Invalid JSON in login request", {
-        level: "warning",
-        extra: {
-          parseError:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
-        },
-      });
-      return NextResponse.json(
-        { message: "Invalid JSON payload" },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
     const { email, password } = body;
 
     if (!email || !password) {
-      Sentry.addBreadcrumb({
-        message: "Login attempt with missing credentials",
-        category: "auth",
-        level: "warning",
-        data: { hasEmail: !!email, hasPassword: !!password },
-      });
       return NextResponse.json(
         { message: "Email and password are required" },
         { status: 400 }
@@ -65,18 +25,6 @@ export async function POST(request: NextRequest) {
       const accessToken = await encryptAccessToken(userId);
       const refreshToken = await encryptRefreshToken(userId, jti);
 
-      Sentry.setUser({
-        id: userId,
-        email: email,
-      });
-
-      Sentry.addBreadcrumb({
-        message: "Successful login",
-        category: "auth",
-        level: "info",
-        data: { userId, email },
-      });
-
       return NextResponse.json(
         {
           accessToken,
@@ -86,13 +34,6 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     }
-
-    Sentry.addBreadcrumb({
-      message: "Failed login attempt",
-      category: "auth",
-      level: "warning",
-      data: { email, reason: "invalid_credentials" },
-    });
 
     return NextResponse.json(
       { message: "Invalid credentials" },
@@ -109,6 +50,16 @@ export async function POST(request: NextRequest) {
         url: request.url,
       },
     });
+
+    Sentry.addBreadcrumb({
+      message: "Login error",
+      category: "auth",
+      level: "error",
+      data: {
+        error: (error as Error).message,
+      },
+    });
+
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

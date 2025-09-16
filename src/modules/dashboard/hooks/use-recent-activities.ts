@@ -32,27 +32,10 @@ async function fetchRecentActivities(
 
   const response = await authFetch(`/api/recent-activities?${searchParams}`);
 
-  // TODO: improve this error handling
-  // if (!response.ok) {
-  //   const error = new Error("Failed to fetch recent activities") as Error & {
-  //     status: number;
-  //   };
-  //   error.status = response.status;
-
-  //   toast.error(`Error ${response.status}: ${response.statusText}`);
-
-  //   Sentry.captureException(error, {
-  //     tags: {
-  //       component: "dashboard-hooks",
-  //       hook: "useRecentActivities",
-  //     },
-  //     extra: {
-  //       action: "fetch_recent_activities",
-  //     },
-  //   });
-
-  //   throw error;
-  // }
+  if (!response.ok) {
+    toast.error(`Error ${response.status}: ${response.statusText}`);
+    throw new Error("Failed to fetch recent activities");
+  }
 
   return response.json();
 }

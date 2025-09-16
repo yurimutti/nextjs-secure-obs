@@ -3,12 +3,12 @@
 import * as Sentry from "@sentry/nextjs";
 import { redirect } from "next/navigation";
 import { FormState, SigninFormSchema } from "../definitions";
-import { env } from "@/config/env";
 import {
   clearAuthCookies,
   setAccessCookie,
   setRefreshCookie,
 } from "@/shared/libs/session";
+import { getRequestUrl } from "@/shared/libs/request-url";
 
 export async function signin(state: FormState, formData: FormData) {
   const validatedFields = SigninFormSchema.safeParse({
@@ -23,35 +23,91 @@ export async function signin(state: FormState, formData: FormData) {
   }
 
   const { email, password } = validatedFields.data;
+  const { url, headers: requestHeaders } = await getRequestUrl('/api/auth/login');
 
-  const response = await fetch(`${env.API_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...requestHeaders,
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const data = await response.json();
+    if (!response.ok) {
+      Sentry.addBreadcrumb({
+        message: "Login request failed",
+        category: "auth",
+        level: "warning",
+        data: {
+          status: response.status,
+          statusText: response.statusText,
+        },
+      });
 
-  if (data.message === "ok") {
-    await setAccessCookie(data.accessToken);
-    await setRefreshCookie(data.refreshToken);
+      return {
+        message:
+          response.status >= 500
+            ? "Server error. Please try again later."
+            : "Authentication failed",
+      };
+    }
 
-    redirect("/dashboard");
+    const data = await response.json();
+
+    if (data.message === "ok") {
+      await setAccessCookie(data.accessToken);
+      await setRefreshCookie(data.refreshToken);
+
+      redirect("/dashboard");
+    }
+
+    return {
+      message: data.message || "Authentication failed",
+    };
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: {
+        component: "auth-actions",
+        action: "signin",
+      },
+      extra: {
+        apiUrl: url,
+      },
+    });
+
+    return {
+      message: "Network error. Please try again later.",
+    };
   }
-
-  return {
-    message: data.message || "Authentication failed",
-  };
 }
 
 export async function logout() {
+  const { url, headers: requestHeaders } = await getRequestUrl('/api/auth/logout');
+
   try {
-    await fetch(`${env.API_BASE_URL}/api/auth/logout`, {
+    const response = await fetch(url, {
       method: "POST",
       credentials: "include",
+      headers: requestHeaders,
     });
+
+    if (!response.ok) {
+      Sentry.addBreadcrumb({
+        message: "Logout request failed",
+        category: "auth",
+        level: "warning",
+        data: {
+          status: response.status,
+          statusText: response.statusText,
+        },
+      });
+    }
+
+    await clearAuthCookies();
+
+    redirect("/logout");
   } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -59,11 +115,8 @@ export async function logout() {
         action: "logout",
       },
       extra: {
-        apiUrl: `${env.API_BASE_URL}/api/auth/logout`,
+        apiUrl: url,
       },
     });
   }
-
-  await clearAuthCookies();
-  redirect("/logout");
 }
