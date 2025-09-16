@@ -97,6 +97,27 @@ Each technical decision includes:
 - **Manual Testing Steps**
 - **Performance Benchmarks** (where applicable)
 
+### DAL (Data Access Layer) Testing
+
+The DAL layer uses **inline mocking** for better test isolation and maintainability:
+
+- **Self-contained tests**: All mocks are defined within the test file (`src/shared/libs/dal/__tests__/index.test.ts`)
+- **Simple mock objects**: Basic implementations using Map-based storage for cookies and headers
+- **No external dependencies**: Removed dependency on external mock files (`tests/mocks/next-apis.ts`)
+- **Next.js integration**: Mocks for `next/headers`, `server-only`, `@sentry/nextjs`, `jose`, and React components
+
+#### Key Testing Functions:
+- `mockNextHeaders()` - Simulates Next.js headers and cookies
+- `mockServerOnly()` - Mocks server-only directive
+- `mockSentry()` - Stubs Sentry logging functions
+- `mockJose()` - Mocks JWT verification and signing
+- `resetMocks()` - Cleans state between tests
+
+#### Running DAL Tests:
+```bash
+npm test -- --testPathPattern=dal
+```
+
 ## Contributing
 
 When making architectural changes:
