@@ -197,7 +197,6 @@ export async function GET(request: NextRequest) {
     // Set user context for Sentry
     Sentry.setUser({
       id: session.userId,
-      email: session.email,
     });
 
     // Error simulation for observability testing
