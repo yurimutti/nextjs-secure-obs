@@ -33,6 +33,7 @@ export function LoginScreen() {
             className="space-y-4"
             aria-labelledby="login-heading"
             aria-describedby="login-description"
+            data-cy="login-form"
           >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -46,6 +47,7 @@ export function LoginScreen() {
                   state?.errors?.email ? "email-error" : undefined
                 }
                 aria-invalid={state?.errors?.email ? "true" : "false"}
+                data-cy="email-input"
               />
             </div>
             {state?.errors?.email && (
@@ -70,6 +72,7 @@ export function LoginScreen() {
                   state?.errors?.password ? "password-error" : undefined
                 }
                 aria-invalid={state?.errors?.password ? "true" : "false"}
+                data-cy="password-input"
               />
             </div>
             {state?.errors?.password && (
@@ -98,6 +101,7 @@ export function LoginScreen() {
               type="submit"
               className="w-full"
               aria-describedby="login-description"
+              data-cy="login-submit"
             >
               {pending ? "Logging In..." : "Login"}
             </Button>

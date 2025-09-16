@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --port 3000",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,11 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:server": "jest --selectProjects server",
-    "test:client": "jest --selectProjects client"
+    "test:client": "jest --selectProjects client",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open",
+    "e2e:ci": "cypress run --headless",
+    "test:e2e": "start-server-and-test dev http://localhost:3000 e2e"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -54,6 +58,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cypress": "^15.2.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "eslint-config-prettier": "^10.1.8",
@@ -61,6 +66,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.8.6",
     "prettier": "^3.6.2",
+    "start-server-and-test": "^2.1.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",

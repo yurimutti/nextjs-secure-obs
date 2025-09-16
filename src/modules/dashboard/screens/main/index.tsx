@@ -16,7 +16,7 @@ export async function DashboardScreen() {
   const userProfile = await getUserProfile();
 
   return (
-    <main>
+    <main data-cy="dashboard-main">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
           Welcome to your member area

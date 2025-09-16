@@ -118,6 +118,43 @@ The DAL layer uses **inline mocking** for better test isolation and maintainabil
 npm test -- --testPathPattern=dal
 ```
 
+### E2E Testing with Cypress
+
+The project includes **Cypress** for end-to-end testing, focusing on the critical authentication flow:
+
+- **Test coverage**: Login → API authentication → Dashboard access
+- **Custom commands**: Reusable commands for common auth flows
+- **Data attributes**: Uses `data-cy` attributes for reliable element selection
+- **API testing**: Validates authentication API responses and behavior
+
+#### Key E2E Test Files:
+- `cypress/e2e/auth-flow.cy.ts` - Complete authentication flow tests
+- `cypress/support/commands.ts` - Custom commands (`cy.login()`, `cy.shouldBeOnDashboard()`)
+- `cypress/fixtures/user.json` - Test user credentials
+
+#### Running E2E Tests:
+```bash
+# Open Cypress Test Runner (interactive)
+npm run e2e:open
+
+# Run tests headlessly
+npm run e2e
+
+# Run tests in CI mode
+npm run e2e:ci
+
+# Start dev server and run E2E tests
+npm run test:e2e
+```
+
+#### Test Scenarios Covered:
+- ✅ Successful login with valid credentials
+- ✅ Failed login with invalid credentials
+- ✅ Protected route redirection
+- ✅ Session persistence across page refreshes
+- ✅ API endpoint validation
+- ✅ Custom command usage
+
 ## Contributing
 
 When making architectural changes:
