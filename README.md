@@ -117,6 +117,20 @@ Open [http://localhost:3000](http://localhost:3000) (or the port shown in termin
 | `yarn format`       | Format code with Prettier               |
 | `yarn format:check` | Check code formatting with Prettier     |
 
+### 🧪 Testing Scripts
+
+| Command               | Description                                    |
+| --------------------- | ---------------------------------------------- |
+| `yarn test`           | Run unit tests with Jest                      |
+| `yarn test:watch`     | Run unit tests in watch mode                  |
+| `yarn test:coverage`  | Run unit tests with coverage report           |
+| `yarn test:server`    | Run server-side unit tests only               |
+| `yarn test:client`    | Run client-side unit tests only               |
+| `yarn e2e`            | Run end-to-end tests with Cypress             |
+| `yarn e2e:open`       | Open Cypress interactive test runner          |
+| `yarn e2e:ci`         | Run end-to-end tests in headless mode         |
+| `yarn test:e2e`       | Start dev server and run e2e tests            |
+
 ## 🛠 Tech Highlights
 
 ### **Core Technologies**
@@ -146,6 +160,72 @@ Open [http://localhost:3000](http://localhost:3000) (or the port shown in termin
 - **Error simulation** for testing observability tools
 - **Comprehensive testing** with Jest and React Testing Library
 - **Accessibility testing** with axe-core integration
+
+## 🧪 Testing
+
+This project includes comprehensive testing setup for both unit and end-to-end testing:
+
+### **Unit Testing (Jest)**
+
+- **Jest** with TypeScript support and JSDOM environment
+- **React Testing Library** for component testing
+- **MSW** for API mocking during tests
+- **Coverage reporting** with detailed metrics
+- **Separate test suites** for client and server code
+
+**Running Tests:**
+```bash
+# Run all unit tests
+yarn test
+
+# Run tests in watch mode during development
+yarn test:watch
+
+# Generate coverage report
+yarn test:coverage
+
+# Run only server-side tests
+yarn test:server
+
+# Run only client-side tests
+yarn test:client
+```
+
+### **End-to-End Testing (Cypress)**
+
+- **Cypress** for comprehensive E2E testing
+- **Authentication flow testing** with real login scenarios
+- **Dashboard functionality** testing with protected routes
+- **Cross-browser compatibility** testing
+
+**Running E2E Tests:**
+```bash
+# Run E2E tests headlessly
+yarn e2e
+
+# Open Cypress interactive runner
+yarn e2e:open
+
+# Run E2E tests in CI mode
+yarn e2e:ci
+
+# Start dev server and run E2E tests
+yarn test:e2e
+```
+
+### **Test Structure**
+
+```
+├── __tests__/              # Unit tests
+│   ├── components/         # Component tests
+│   ├── lib/               # Utility function tests
+│   └── app/               # Page and API tests
+├── cypress/               # E2E tests
+│   ├── e2e/              # Test scenarios
+│   ├── fixtures/         # Test data
+│   └── support/          # Helper functions
+└── jest.config.js        # Jest configuration
+```
 
 ## 📚 Documentation
 
