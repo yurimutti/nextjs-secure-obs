@@ -31,12 +31,12 @@ export function UserMenu({ user }: UserMenuProps) {
             <AvatarFallback className="dark text-white">
               {user?.name
                 ? user.name
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
                     .toUpperCase()
                     .slice(0, 2)
-                : 'U'}
+                : "U"}
             </AvatarFallback>
           </Avatar>
         </Button>

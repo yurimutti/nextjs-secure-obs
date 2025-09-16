@@ -11,6 +11,7 @@
 Client-side components need to make authenticated API requests while handling token expiration, refresh logic, and error scenarios gracefully. The authentication system uses HttpOnly cookies, but client-side code needs robust patterns for handling authentication failures and automatic token refresh.
 
 ### Problem Statement
+
 - Client components need to make authenticated API calls
 - Handle token expiration transparently for users
 - Implement retry logic for failed authentication
@@ -18,6 +19,7 @@ Client-side components need to make authenticated API requests while handling to
 - Integrate seamlessly with React Query for state management
 
 ### Constraints
+
 - Cannot access HttpOnly cookies from JavaScript
 - Must handle 401 responses gracefully
 - Need automatic token refresh without user intervention
@@ -77,12 +79,12 @@ export async function authFetch(
 
 ### Why Custom Auth Fetch?
 
-| Approach | Auto-Retry | Token Refresh | Error Handling | Integration | Decision |
-|----------|------------|---------------|----------------|-------------|----------|
-| **Native fetch** | ❌ Manual | ❌ Manual | ❌ Manual | ✅ Universal | ❌ Too basic |
-| **Axios interceptors** | ✅ Built-in | ✅ Configurable | ✅ Good | ❌ Bundle size | ❌ Overhead |
-| **SWR auth** | ✅ Built-in | ❌ Manual | ✅ Good | ✅ React | 🔄 Alternative |
-| **Custom authFetch** | ✅ Tailored | ✅ Automatic | ✅ Complete | ✅ Flexible | ✅ **Selected** |
+| Approach               | Auto-Retry  | Token Refresh   | Error Handling | Integration    | Decision        |
+| ---------------------- | ----------- | --------------- | -------------- | -------------- | --------------- |
+| **Native fetch**       | ❌ Manual   | ❌ Manual       | ❌ Manual      | ✅ Universal   | ❌ Too basic    |
+| **Axios interceptors** | ✅ Built-in | ✅ Configurable | ✅ Good        | ❌ Bundle size | ❌ Overhead     |
+| **SWR auth**           | ✅ Built-in | ❌ Manual       | ✅ Good        | ✅ React       | 🔄 Alternative  |
+| **Custom authFetch**   | ✅ Tailored | ✅ Automatic    | ✅ Complete    | ✅ Flexible    | ✅ **Selected** |
 
 ### Key Decision Factors
 
@@ -127,11 +129,11 @@ flowchart TD
 // Custom hook with authFetch integration
 export function useRecentActivities(params?: { limit?: number }) {
   return useQuery({
-    queryKey: ['recent-activities', params],
+    queryKey: ["recent-activities", params],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
       if (params?.limit) {
-        searchParams.set('limit', params.limit.toString());
+        searchParams.set("limit", params.limit.toString());
       }
 
       const response = await authFetch(
@@ -139,14 +141,17 @@ export function useRecentActivities(params?: { limit?: number }) {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch activities');
+        throw new Error("Failed to fetch activities");
       }
 
       return response.json();
     },
     retry: (failureCount, error) => {
       // Don't retry auth failures (already handled by authFetch)
-      if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+      if (
+        error.message.includes("401") ||
+        error.message.includes("Unauthorized")
+      ) {
         return false;
       }
       return failureCount < 3;
@@ -192,10 +197,13 @@ export async function authFetch(
         const retryResponse = await fetch(url, mergedOptions);
 
         if (retryResponse.status === 401) {
-          Sentry.captureMessage("Request still unauthorized after token refresh", {
-            level: "warning",
-            extra: { url, method: options.method || "GET" },
-          });
+          Sentry.captureMessage(
+            "Request still unauthorized after token refresh",
+            {
+              level: "warning",
+              extra: { url, method: options.method || "GET" },
+            }
+          );
 
           if (typeof window !== "undefined") {
             window.location.href = "/login";
@@ -204,13 +212,16 @@ export async function authFetch(
 
         return retryResponse;
       } else {
-        Sentry.captureMessage("Client token refresh failed, redirecting to login", {
-          level: "warning",
-          extra: {
-            refreshStatus: refreshResponse.status,
-            originalUrl: url,
-          },
-        });
+        Sentry.captureMessage(
+          "Client token refresh failed, redirecting to login",
+          {
+            level: "warning",
+            extra: {
+              refreshStatus: refreshResponse.status,
+              originalUrl: url,
+            },
+          }
+        );
 
         if (typeof window !== "undefined") {
           window.location.href = "/login";
@@ -317,16 +328,17 @@ export function RecentActivities() {
 
 ### Risk Mitigation
 
-| Risk | Impact | Mitigation |
-|------|---------|------------|
-| **Infinite Refresh Loops** | High | Single retry limit, timeout handling |
-| **Race Conditions** | Medium | Request queuing, debounced refreshes |
-| **Error Masking** | Medium | Comprehensive Sentry logging |
-| **Testing Complexity** | Low | Mock authFetch in tests |
+| Risk                       | Impact | Mitigation                           |
+| -------------------------- | ------ | ------------------------------------ |
+| **Infinite Refresh Loops** | High   | Single retry limit, timeout handling |
+| **Race Conditions**        | Medium | Request queuing, debounced refreshes |
+| **Error Masking**          | Medium | Comprehensive Sentry logging         |
+| **Testing Complexity**     | Low    | Mock authFetch in tests              |
 
 ## Authentication Flow Examples
 
 ### Successful Request Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Component
@@ -343,6 +355,7 @@ sequenceDiagram
 ```
 
 ### Token Refresh Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Component
@@ -367,50 +380,54 @@ sequenceDiagram
 ## Testing Strategy
 
 ### Unit Tests
+
 ```typescript
-describe('authFetch', () => {
+describe("authFetch", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
   });
 
-  test('should include credentials in requests', async () => {
+  test("should include credentials in requests", async () => {
     const mockResponse = { ok: true, status: 200, json: () => ({}) };
     (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-    await authFetch('/api/test');
+    await authFetch("/api/test");
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/test',
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/test",
       expect.objectContaining({
-        credentials: 'include'
+        credentials: "include",
       })
     );
   });
 
-  test('should attempt token refresh on 401', async () => {
+  test("should attempt token refresh on 401", async () => {
     const unauthorizedResponse = { ok: false, status: 401 };
     const refreshResponse = { ok: true, status: 200 };
     const retryResponse = { ok: true, status: 200, json: () => ({}) };
 
     (global.fetch as jest.Mock)
-      .mockResolvedValueOnce(unauthorizedResponse)  // Initial request
-      .mockResolvedValueOnce(refreshResponse)       // Refresh request
-      .mockResolvedValueOnce(retryResponse);        // Retry request
+      .mockResolvedValueOnce(unauthorizedResponse) // Initial request
+      .mockResolvedValueOnce(refreshResponse) // Refresh request
+      .mockResolvedValueOnce(retryResponse); // Retry request
 
-    await authFetch('/api/test');
+    await authFetch("/api/test");
 
     expect(global.fetch).toHaveBeenCalledTimes(3);
-    expect(global.fetch).toHaveBeenNthCalledWith(2, '/api/auth/refresh',
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      "/api/auth/refresh",
       expect.objectContaining({
-        method: 'POST',
-        credentials: 'include'
+        method: "POST",
+        credentials: "include",
       })
     );
   });
 
-  test('should redirect to login on refresh failure', async () => {
+  test("should redirect to login on refresh failure", async () => {
     delete (window as any).location;
-    (window as any).location = { href: '' };
+    (window as any).location = { href: "" };
 
     const unauthorizedResponse = { ok: false, status: 401 };
     const refreshFailure = { ok: false, status: 401 };
@@ -419,31 +436,33 @@ describe('authFetch', () => {
       .mockResolvedValueOnce(unauthorizedResponse)
       .mockResolvedValueOnce(refreshFailure);
 
-    await authFetch('/api/test');
+    await authFetch("/api/test");
 
-    expect(window.location.href).toBe('/login');
+    expect(window.location.href).toBe("/login");
   });
 });
 ```
 
 ### Integration Tests
+
 ```typescript
-describe('React Query + authFetch Integration', () => {
-  test('should retry failed requests automatically', async () => {
+describe("React Query + authFetch Integration", () => {
+  test("should retry failed requests automatically", async () => {
     // Test React Query retry behavior with authFetch
   });
 
-  test('should handle authentication errors gracefully', async () => {
+  test("should handle authentication errors gracefully", async () => {
     // Test error boundaries with auth failures
   });
 
-  test('should refresh data after successful auth refresh', async () => {
+  test("should refresh data after successful auth refresh", async () => {
     // Test data refetching after token refresh
   });
 });
 ```
 
 ### Manual Testing
+
 ```bash
 # Test authenticated request
 curl -X GET http://localhost:3004/api/recent-activities \
@@ -459,6 +478,7 @@ curl -X GET http://localhost:3004/api/recent-activities \
 ## How to Test
 
 ### Browser Testing
+
 1. **Login and Access Data**
    - Login with valid credentials
    - Navigate to dashboard
@@ -480,6 +500,7 @@ curl -X GET http://localhost:3004/api/recent-activities \
    - Test retry behavior
 
 ### Performance Testing
+
 1. **Load Testing**: Measure performance impact of auth wrapper
 2. **Memory Testing**: Verify no memory leaks from retry logic
 3. **Bundle Analysis**: Confirm no significant bundle size increase
@@ -516,10 +537,12 @@ curl -X GET http://localhost:3004/api/recent-activities \
 ---
 
 **Implementation Files**:
+
 - `src/modules/auth/utils/auth-fetch.ts` - Core authFetch implementation
 - `src/modules/dashboard/hooks/use-recent-activities.ts` - React Query integration
 - `src/modules/dashboard/components/recent-activities/index.tsx` - Component usage
 
 **Related ADRs**:
+
 - [ADR-0001](./0001-auth-storage-httpOnly-cookies.md) - HttpOnly cookie storage
 - [ADR-0007](./0007-error-handling-and-retry-strategy.md) - Error handling patterns

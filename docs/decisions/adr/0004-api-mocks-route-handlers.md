@@ -11,6 +11,7 @@
 The secure member area MVP requires realistic API endpoints for demonstrating authentication patterns, data fetching, and error handling without a full backend implementation. The mock APIs must integrate seamlessly with Next.js App Router and provide realistic data and error scenarios.
 
 ### Problem Statement
+
 - Need realistic API endpoints for dashboard functionality
 - Demonstrate authentication validation in API routes
 - Provide consistent mock data for development and testing
@@ -18,6 +19,7 @@ The secure member area MVP requires realistic API endpoints for demonstrating au
 - Support rapid prototyping without backend dependency
 
 ### Constraints
+
 - Must integrate with Next.js 15 App Router Route Handlers
 - Should validate authentication using existing session management
 - Need to simulate realistic data structures
@@ -47,7 +49,6 @@ export async function GET(request: NextRequest) {
     // Generate mock data
     const data = generateMockData(session.userId);
     return NextResponse.json(data);
-
   } catch (error) {
     // Error tracking
     Sentry.captureException(error);
@@ -63,12 +64,12 @@ export async function GET(request: NextRequest) {
 
 ### Why Route Handlers Over Alternatives?
 
-| Approach | Integration | Auth Support | Error Simulation | Scalability | Decision |
-|----------|-------------|--------------|------------------|-------------|----------|
-| **MSW (Mock Service Worker)** | ❌ Complex | ❌ Limited | ✅ Good | ✅ Excellent | ❌ Over-engineering |
-| **JSON Server** | ❌ Separate process | ❌ None | ❌ Limited | ❌ Poor | ❌ Too simple |
-| **Express Mock Server** | ❌ Separate stack | ✅ Custom | ✅ Good | ✅ Good | ❌ Additional complexity |
-| **Next.js Route Handlers** | ✅ Native | ✅ Built-in | ✅ Full control | ✅ Excellent | ✅ **Selected** |
+| Approach                      | Integration         | Auth Support | Error Simulation | Scalability  | Decision                 |
+| ----------------------------- | ------------------- | ------------ | ---------------- | ------------ | ------------------------ |
+| **MSW (Mock Service Worker)** | ❌ Complex          | ❌ Limited   | ✅ Good          | ✅ Excellent | ❌ Over-engineering      |
+| **JSON Server**               | ❌ Separate process | ❌ None      | ❌ Limited       | ❌ Poor      | ❌ Too simple            |
+| **Express Mock Server**       | ❌ Separate stack   | ✅ Custom    | ✅ Good          | ✅ Good      | ❌ Additional complexity |
+| **Next.js Route Handlers**    | ✅ Native           | ✅ Built-in  | ✅ Full control  | ✅ Excellent | ✅ **Selected**          |
 
 ### Key Decision Factors
 
@@ -83,6 +84,7 @@ export async function GET(request: NextRequest) {
 ### API Contracts
 
 #### User Profile Endpoint
+
 ```typescript
 // GET /api/user-profile
 interface UserProfileResponse {
@@ -96,6 +98,7 @@ interface UserProfileResponse {
 ```
 
 #### Recent Activities Endpoint
+
 ```typescript
 // GET /api/recent-activities?limit=10&offset=0
 interface Activity {
@@ -103,7 +106,7 @@ interface Activity {
   action: string;
   timestamp: string;
   details: string;
-  status: 'success' | 'warning' | 'error';
+  status: "success" | "warning" | "error";
   user: string;
 }
 
@@ -124,11 +127,13 @@ const generateMockActivities = (count: number = 20): Activity[] => {
     "Atualizou perfil",
     "Alterou senha",
     "Fez upload de arquivo",
-    "Exportou dados"
+    "Exportou dados",
   ];
 
-  const statuses: ('success' | 'warning' | 'error')[] = [
-    'success', 'warning', 'error'
+  const statuses: ("success" | "warning" | "error")[] = [
+    "success",
+    "warning",
+    "error",
   ];
 
   return Array.from({ length: count }, (_, i) => ({
@@ -140,8 +145,8 @@ const generateMockActivities = (count: number = 20): Activity[] => {
     details: `Ação executada com sucesso - ID ${i + 1}`,
     status: statuses[Math.floor(Math.random() * statuses.length)],
     user: `user-${Math.floor(Math.random() * 5) + 1}`,
-  })).sort((a, b) =>
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  })).sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 };
 ```
@@ -161,12 +166,10 @@ const generateSimulatedError = (context: string) => {
     "Database connection timeout",
     "Service temporarily unavailable",
     "Rate limit exceeded",
-    "Invalid request parameters"
+    "Invalid request parameters",
   ];
 
-  const error = new Error(
-    errors[Math.floor(Math.random() * errors.length)]
-  );
+  const error = new Error(errors[Math.floor(Math.random() * errors.length)]);
   error.name = `${context}SimulationError`;
   return error;
 };
@@ -194,7 +197,7 @@ export async function GET(request: NextRequest) {
     // Set user context for Sentry
     Sentry.setUser({
       id: session.userId,
-      email: session.email
+      email: session.email,
     });
 
     // Error simulation for observability testing
@@ -209,13 +212,13 @@ export async function GET(request: NextRequest) {
         tags: {
           component: "api",
           route: "recent-activities",
-          error_type: "simulated"
+          error_type: "simulated",
         },
         extra: {
           userId: session.userId,
           simulationThreshold: ERROR_SIMULATION_THRESHOLD,
-          wasTriggered: true
-        }
+          wasTriggered: true,
+        },
       });
 
       throw simulatedError;
@@ -235,18 +238,17 @@ export async function GET(request: NextRequest) {
       total: activities.length,
       hasMore: offset + limit < activities.length,
     });
-
   } catch (error) {
     Sentry.captureException(error, {
       tags: {
         component: "api",
-        route: "recent-activities"
+        route: "recent-activities",
       },
       extra: {
         method: request.method,
         url: request.url,
-        errorMessage: error instanceof Error ? error.message : String(error)
-      }
+        errorMessage: error instanceof Error ? error.message : String(error),
+      },
     });
 
     return NextResponse.json(
@@ -354,12 +356,12 @@ flowchart TD
 
 ### Migration Considerations
 
-| Aspect | Mock Implementation | Real Backend |
-|--------|-------------------|--------------|
-| **Authentication** | Session validation | OAuth/JWT validation |
-| **Data Storage** | In-memory generation | Database queries |
-| **Error Handling** | Simulated errors | Real system errors |
-| **Performance** | Instant responses | Network/DB latency |
+| Aspect             | Mock Implementation  | Real Backend         |
+| ------------------ | -------------------- | -------------------- |
+| **Authentication** | Session validation   | OAuth/JWT validation |
+| **Data Storage**   | In-memory generation | Database queries     |
+| **Error Handling** | Simulated errors     | Real system errors   |
+| **Performance**    | Instant responses    | Network/DB latency   |
 
 ## Mock vs Real Backend Transition
 
@@ -367,32 +369,35 @@ flowchart TD
 // Configuration-based backend switching
 const API_CONFIG = {
   development: {
-    mode: 'mock',
+    mode: "mock",
     errorRate: 0.3,
-    latency: 0
+    latency: 0,
   },
   staging: {
-    mode: 'hybrid', // Some real, some mock
+    mode: "hybrid", // Some real, some mock
     errorRate: 0.1,
-    latency: 100
+    latency: 100,
   },
   production: {
-    mode: 'real',
+    mode: "real",
     errorRate: 0.01,
-    latency: 'variable'
-  }
+    latency: "variable",
+  },
 };
 ```
 
 ## How to Test
 
 ### Development Testing
+
 1. **Start Development Server**
+
    ```bash
    npm run dev
    ```
 
 2. **Test Authentication Flow**
+
    ```bash
    # Login first
    curl -X POST http://localhost:3004/api/auth/login \
@@ -416,18 +421,19 @@ const API_CONFIG = {
    ```
 
 ### Integration Testing
+
 ```typescript
-describe('Mock API Integration', () => {
-  test('should require authentication', async () => {
-    const response = await fetch('/api/user-profile');
+describe("Mock API Integration", () => {
+  test("should require authentication", async () => {
+    const response = await fetch("/api/user-profile");
     expect(response.status).toBe(401);
   });
 
-  test('should return user data when authenticated', async () => {
+  test("should return user data when authenticated", async () => {
     // Login first, then test API
   });
 
-  test('should simulate errors occasionally', async () => {
+  test("should simulate errors occasionally", async () => {
     // Multiple requests to trigger error simulation
   });
 });
@@ -460,10 +466,12 @@ describe('Mock API Integration', () => {
 ---
 
 **Implementation Files**:
+
 - `src/app/api/user-profile/route.ts` - User profile mock API
 - `src/app/api/recent-activities/route.ts` - Activities mock API
 - `src/app/api/recent-activities/types.ts` - Type definitions
 
 **Related ADRs**:
+
 - [ADR-0002](./0002-protected-ssr-dashboard-middleware-vs-handler.md) - Authentication validation
 - [ADR-0005](./0005-sentry-observability-setup.md) - Error tracking integration

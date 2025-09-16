@@ -11,6 +11,7 @@
 The secure member area must be accessible to users with diverse needs, including those using assistive technologies, different languages, and various devices. The application needs to comply with WCAG 2.1 AA standards while supporting future internationalization.
 
 ### Problem Statement
+
 - Ensure accessibility compliance (WCAG 2.1 AA)
 - Support screen readers and keyboard navigation
 - Provide responsive design across devices
@@ -27,15 +28,16 @@ The secure member area must be accessible to users with diverse needs, including
 // Screen reader support with custom hooks
 export function useScreenReaderAnnouncement() {
   const announce = (message: string, priority: AriaLiveType = "polite") => {
-    const regionId = priority === "assertive"
-      ? "assertive-announcements"
-      : "polite-announcements";
+    const regionId =
+      priority === "assertive"
+        ? "assertive-announcements"
+        : "polite-announcements";
     const region = document.getElementById(regionId);
 
     if (region) {
       region.textContent = "";
-      setTimeout(() => region.textContent = message, 100);
-      setTimeout(() => region.textContent = "", 3000);
+      setTimeout(() => (region.textContent = message), 100);
+      setTimeout(() => (region.textContent = ""), 3000);
     }
   };
 
@@ -162,7 +164,9 @@ export function useFocusTrap<T extends HTMLElement>(active: boolean = true) {
 
 /* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
@@ -234,6 +238,7 @@ export default function RootLayout({
 ## Testing & Validation
 
 ### Accessibility Testing Tools
+
 ```bash
 # Automated accessibility testing
 npm install -g @axe-core/cli
@@ -244,6 +249,7 @@ lighthouse http://localhost:3004 --only-categories=accessibility
 ```
 
 ### Manual Testing Procedures
+
 1. **Keyboard Navigation**: Tab through entire application
 2. **Screen Reader**: Test with VoiceOver/NVDA/JAWS
 3. **High Contrast**: Test in high contrast mode
@@ -251,6 +257,7 @@ lighthouse http://localhost:3004 --only-categories=accessibility
 5. **Touch Targets**: Verify 44px minimum touch targets
 
 ### WCAG 2.1 AA Compliance Checklist
+
 - [x] **1.1 Text Alternatives**: Alt text for images, aria-label for icons
 - [x] **1.3 Adaptable**: Semantic HTML structure, logical reading order
 - [x] **1.4 Distinguishable**: Color contrast, resize text, visual focus
@@ -262,15 +269,17 @@ lighthouse http://localhost:3004 --only-categories=accessibility
 - [x] **4.1 Compatible**: Valid HTML, proper ARIA usage
 
 ### Responsive Testing
-| Breakpoint | Device Examples | Testing Focus |
-|-----------|----------------|---------------|
-| 320px-767px | Mobile phones | Touch navigation, content priority |
-| 768px-1023px | Tablets | Mixed input methods, layout adaptation |
-| 1024px+ | Desktop | Keyboard navigation, full feature access |
+
+| Breakpoint   | Device Examples | Testing Focus                            |
+| ------------ | --------------- | ---------------------------------------- |
+| 320px-767px  | Mobile phones   | Touch navigation, content priority       |
+| 768px-1023px | Tablets         | Mixed input methods, layout adaptation   |
+| 1024px+      | Desktop         | Keyboard navigation, full feature access |
 
 ## How to Test
 
 ### Automated Testing
+
 ```bash
 # Install accessibility testing tools
 npm install --save-dev @axe-core/react jest-axe
@@ -280,18 +289,21 @@ npm run test:a11y
 ```
 
 ### Browser Testing
+
 1. **Chrome DevTools**: Lighthouse accessibility audit
 2. **Firefox**: Accessibility inspector
 3. **Safari**: Accessibility audit tools
 4. **Edge**: Accessibility insights
 
 ### Manual Testing with Assistive Technology
+
 1. **macOS VoiceOver**: Command + F5 to enable
 2. **Windows NVDA**: Free screen reader download
 3. **Windows JAWS**: Professional screen reader
 4. **Mobile VoiceOver/TalkBack**: Native mobile screen readers
 
 ### Keyboard Navigation Testing
+
 ```
 Tab: Navigate forward through interactive elements
 Shift+Tab: Navigate backward
@@ -303,11 +315,13 @@ Arrow Keys: Navigate within components
 ## Performance Considerations
 
 ### Core Web Vitals Impact
+
 - **LCP**: Semantic HTML improves parsing speed
 - **FID**: Proper focus management enhances interaction
 - **CLS**: Consistent layouts prevent layout shifts
 
 ### Accessibility CSS Optimization
+
 ```css
 /* Efficient screen reader only content */
 .sr-only {
@@ -359,6 +373,7 @@ Arrow Keys: Navigate within components
 ---
 
 **Implementation Files**:
+
 - `src/components/skip-link/index.tsx` - Skip navigation links
 - `src/shared/hooks/use-screen-reader.ts` - Screen reader announcements
 - `src/shared/hooks/use-focus-trap.ts` - Focus management
@@ -366,5 +381,6 @@ Arrow Keys: Navigate within components
 - `ACCESSIBILITY.md` - Detailed accessibility documentation
 
 **Related ADRs**:
+
 - [ADR-0007](./0007-error-handling-and-retry-strategy.md) - Error user feedback
 - [RFC-0001](../rfc/0001-secure-member-area-mvp.md) - Overall UX requirements

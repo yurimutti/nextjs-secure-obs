@@ -59,13 +59,16 @@ export async function authFetch(
         const retryResponse = await fetch(url, mergedOptions);
 
         if (retryResponse.status === 401) {
-          Sentry.captureMessage("Request still unauthorized after token refresh", {
-            level: "warning",
-            extra: {
-              url,
-              method: options.method || "GET",
-            },
-          });
+          Sentry.captureMessage(
+            "Request still unauthorized after token refresh",
+            {
+              level: "warning",
+              extra: {
+                url,
+                method: options.method || "GET",
+              },
+            }
+          );
 
           if (typeof window !== "undefined") {
             window.location.href = "/login";
@@ -75,14 +78,17 @@ export async function authFetch(
 
         return retryResponse;
       } else {
-        Sentry.captureMessage("Client token refresh failed, redirecting to login", {
-          level: "warning",
-          extra: {
-            refreshStatus: refreshResponse.status,
-            refreshStatusText: refreshResponse.statusText,
-            originalUrl: url,
-          },
-        });
+        Sentry.captureMessage(
+          "Client token refresh failed, redirecting to login",
+          {
+            level: "warning",
+            extra: {
+              refreshStatus: refreshResponse.status,
+              refreshStatusText: refreshResponse.statusText,
+              originalUrl: url,
+            },
+          }
+        );
 
         if (typeof window !== "undefined") {
           window.location.href = "/login";

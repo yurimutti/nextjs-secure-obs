@@ -127,7 +127,11 @@ export function RecentActivities() {
               onClick={() => refetch()}
               variant="outline"
               disabled={isRefreshing}
-              aria-label={isRefreshing ? "Retrying to load activities" : "Retry loading activities"}
+              aria-label={
+                isRefreshing
+                  ? "Retrying to load activities"
+                  : "Retry loading activities"
+              }
             >
               {isRefreshing ? "Tentando..." : "Tentar Novamente"}
             </Button>
@@ -149,7 +153,9 @@ export function RecentActivities() {
           size="icon"
           onClick={handleRefresh}
           disabled={isRefreshing}
-          aria-label={isRefreshing ? "Refreshing activities" : "Refresh activities"}
+          aria-label={
+            isRefreshing ? "Refreshing activities" : "Refresh activities"
+          }
         >
           <RefreshCw
             className={cn("h-4 w-4", isRefreshing && "animate-spin")}
@@ -161,7 +167,8 @@ export function RecentActivities() {
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8">
             <p className="text-muted-foreground">
-              Nenhuma atividade recente encontrada (somente para erro de backend, atualize a página)
+              Nenhuma atividade recente encontrada (somente para erro de
+              backend, atualize a página)
             </p>
           </div>
         ) : (

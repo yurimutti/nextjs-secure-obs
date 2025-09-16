@@ -33,6 +33,7 @@ SecureOBS Dashboard is a production-ready secure member area that showcases ente
 <td width="50%">
 
 ### 🔐 **Security First**
+
 - JWT authentication via HttpOnly cookies
 - CSRF protection with SameSite=Strict
 - Server-side session validation
@@ -42,6 +43,7 @@ SecureOBS Dashboard is a production-ready secure member area that showcases ente
 <td width="50%">
 
 ### 📊 **Observability**
+
 - Client & server error tracking with Sentry
 - Performance monitoring and Core Web Vitals
 - Authentication flow analytics
@@ -53,6 +55,7 @@ SecureOBS Dashboard is a production-ready secure member area that showcases ente
 <td width="50%">
 
 ### ⚡ **Performance**
+
 - Server-side rendered protected dashboard
 - React Query for efficient data fetching
 - Automatic token refresh with retry logic
@@ -62,6 +65,7 @@ SecureOBS Dashboard is a production-ready secure member area that showcases ente
 <td width="50%">
 
 ### ♿ **Accessibility**
+
 - WCAG 2.1 AA compliance
 - Screen reader support with live regions
 - Keyboard navigation and skip links
@@ -96,43 +100,48 @@ yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) (or the port shown in terminal) and login with:
+
 - **Email**: `teste@email.com`
 - **Password**: `123456`
 
 ## 📜 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `yarn dev` | Start development server with Turbopack |
-| `yarn build` | Build the application for production |
-| `yarn start` | Start the production server |
-| `yarn lint` | Run ESLint for code quality |
-| `yarn lint:fix` | Run ESLint and fix issues automatically |
-| `yarn typecheck` | Run TypeScript type checking |
-| `yarn format` | Format code with Prettier |
-| `yarn format:check` | Check code formatting with Prettier |
+| Command             | Description                             |
+| ------------------- | --------------------------------------- |
+| `yarn dev`          | Start development server with Turbopack |
+| `yarn build`        | Build the application for production    |
+| `yarn start`        | Start the production server             |
+| `yarn lint`         | Run ESLint for code quality             |
+| `yarn lint:fix`     | Run ESLint and fix issues automatically |
+| `yarn typecheck`    | Run TypeScript type checking            |
+| `yarn format`       | Format code with Prettier               |
+| `yarn format:check` | Check code formatting with Prettier     |
 
 ## 🛠 Tech Highlights
 
 ### **Core Technologies**
+
 - **Next.js 15** with App Router and Server Components
 - **TypeScript 5.0** for type safety across the stack
 - **React Query** for client-side state management
 - **Tailwind CSS** + **shadcn/ui** for modern styling
 
 ### **Security & Authentication**
+
 - **JWT tokens** stored in HttpOnly cookies with proper flags
 - **Server-side session validation** using Data Access Layer (DAL)
 - **CSRF protection** via SameSite=Strict cookies
 - **Automatic token refresh** with transparent user experience
 
 ### **Observability & Monitoring**
+
 - **Sentry integration** for client and server error tracking
 - **Performance monitoring** with Core Web Vitals tracking
 - **Error boundaries** with user-friendly fallbacks
 - **Breadcrumbs and context** for enhanced debugging
 
 ### **Development Experience**
+
 - **Route Handlers** for realistic API mocks
 - **Error simulation** for testing observability tools
 - **Comprehensive testing** with Jest and React Testing Library
@@ -148,6 +157,7 @@ Our technical documentation follows RFC/ADR patterns for architectural decisions
 - **[🏗️ Architecture Decision Records](docs/decisions/adr/)** - Detailed technical decisions
 
 ### Key ADRs
+
 - [Auth Storage: HttpOnly Cookies](docs/decisions/adr/0001-auth-storage-httpOnly-cookies.md)
 - [Protected SSR Dashboard Pattern](docs/decisions/adr/0002-protected-ssr-dashboard-middleware-vs-handler.md)
 - [Client Authentication Fetch](docs/decisions/adr/0003-client-fetch-auth-pattern.md)

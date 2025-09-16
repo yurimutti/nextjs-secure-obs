@@ -28,7 +28,9 @@ export function useScreenReaderAnnouncement() {
 
     return () => {
       const politeRegion = document.getElementById("polite-announcements");
-      const assertiveRegion = document.getElementById("assertive-announcements");
+      const assertiveRegion = document.getElementById(
+        "assertive-announcements"
+      );
 
       if (politeRegion) {
         document.body.removeChild(politeRegion);
@@ -42,7 +44,10 @@ export function useScreenReaderAnnouncement() {
   const announce = (message: string, priority: AriaLiveType = "polite") => {
     if (priority === "off") return;
 
-    const regionId = priority === "assertive" ? "assertive-announcements" : "polite-announcements";
+    const regionId =
+      priority === "assertive"
+        ? "assertive-announcements"
+        : "polite-announcements";
     const region = document.getElementById(regionId);
 
     if (region) {

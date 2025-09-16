@@ -11,6 +11,7 @@
 The application requires robust error handling across authentication flows, API requests, and user interactions, with intelligent retry strategies that balance user experience and system reliability.
 
 ### Problem Statement
+
 - Handle various error scenarios gracefully (network, auth, server errors)
 - Implement retry logic for transient failures
 - Provide clear user feedback for error states
@@ -51,11 +52,11 @@ flowchart TD
 ```typescript
 // Error classification and retry strategies
 export const ErrorTypes = {
-  AUTHENTICATION: 'authentication',
-  NETWORK: 'network',
-  SERVER: 'server',
-  CLIENT: 'client',
-  VALIDATION: 'validation'
+  AUTHENTICATION: "authentication",
+  NETWORK: "network",
+  SERVER: "server",
+  CLIENT: "client",
+  VALIDATION: "validation",
 } as const;
 
 export interface ErrorRetryConfig {
@@ -68,26 +69,26 @@ export interface ErrorRetryConfig {
 
 const retryConfigs: Record<string, ErrorRetryConfig> = {
   [ErrorTypes.AUTHENTICATION]: {
-    maxRetries: 1,     // Single token refresh attempt
+    maxRetries: 1, // Single token refresh attempt
     baseDelay: 0,
     maxDelay: 0,
     backoffMultiplier: 1,
-    retryableStatuses: [401]
+    retryableStatuses: [401],
   },
   [ErrorTypes.NETWORK]: {
     maxRetries: 3,
     baseDelay: 1000,
     maxDelay: 8000,
     backoffMultiplier: 2,
-    retryableStatuses: [0, 408, 429, 502, 503, 504]
+    retryableStatuses: [0, 408, 429, 502, 503, 504],
   },
   [ErrorTypes.SERVER]: {
     maxRetries: 2,
     baseDelay: 2000,
     maxDelay: 10000,
     backoffMultiplier: 2,
-    retryableStatuses: [500, 502, 503, 504]
-  }
+    retryableStatuses: [500, 502, 503, 504],
+  },
 };
 ```
 
@@ -121,19 +122,18 @@ export async function authFetch(
       if (response.status >= 500) {
         if (attempt < maxRetries - 1) {
           const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
           attempt++;
           continue;
         }
       }
 
       return response;
-
     } catch (error) {
       // Network or other errors
       if (attempt < maxRetries - 1) {
         const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         attempt++;
         continue;
       }
@@ -266,23 +266,25 @@ export function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
 ## Testing Strategy
 
 ### Error Simulation Testing
+
 ```typescript
-describe('Error Handling', () => {
-  test('should retry server errors with exponential backoff', async () => {
+describe("Error Handling", () => {
+  test("should retry server errors with exponential backoff", async () => {
     // Mock server errors and measure retry delays
   });
 
-  test('should not retry client errors (4xx)', async () => {
+  test("should not retry client errors (4xx)", async () => {
     // Verify no retries for client errors
   });
 
-  test('should redirect to login after auth failure', async () => {
+  test("should redirect to login after auth failure", async () => {
     // Test authentication error flow
   });
 });
 ```
 
 ### Manual Testing Scenarios
+
 1. **Network Interruption**: Disconnect network during API calls
 2. **Server Errors**: Trigger 500 errors via error simulation
 3. **Authentication Expiry**: Test with expired tokens
@@ -291,6 +293,7 @@ describe('Error Handling', () => {
 ## How to Test
 
 ### Error Boundary Testing
+
 ```bash
 # Start development server with error simulation
 npm run dev
@@ -300,6 +303,7 @@ npm run dev
 ```
 
 ### API Error Testing
+
 ```bash
 # Test server error retry
 curl -X GET "http://localhost:3004/api/recent-activities" \
@@ -326,10 +330,12 @@ curl -X GET "http://localhost:3004/api/recent-activities" \
 ---
 
 **Implementation Files**:
+
 - `src/modules/auth/utils/auth-fetch.ts` - Core retry logic
 - `src/components/error/error-boundary.tsx` - Error boundary components
 - `src/components/error/error-fallback.tsx` - Error display components
 
 **Related ADRs**:
+
 - [ADR-0003](./0003-client-fetch-auth-pattern.md) - Client authentication patterns
 - [ADR-0005](./0005-sentry-observability-setup.md) - Error tracking setup

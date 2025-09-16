@@ -37,7 +37,9 @@
   text-decoration: none !important;
   border-radius: 0.375rem !important;
   font-weight: 500 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
   outline: 2px solid hsl(var(--ring)) !important;
   outline-offset: 2px !important;
 }
@@ -53,7 +55,9 @@
 button:focus-visible {
   outline: 3px solid hsl(var(--ring));
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring));
 }
 
 /* Enhanced focus for form inputs */
@@ -87,17 +91,23 @@ a:focus-visible {
 
 /* Loading states */
 .loading-skeleton {
-  background: linear-gradient(90deg,
+  background: linear-gradient(
+    90deg,
     hsl(var(--muted)) 25%,
     hsl(var(--muted-foreground) / 0.1) 50%,
-    hsl(var(--muted)) 75%);
+    hsl(var(--muted)) 75%
+  );
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
 }
 
 @keyframes loading-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* Hover states with better feedback */

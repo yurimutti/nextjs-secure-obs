@@ -11,6 +11,7 @@
 The secure member area requires comprehensive observability for monitoring errors, performance, and user experience. We need to track authentication failures, API errors, client-side issues, and performance metrics across the entire application.
 
 ### Problem Statement
+
 - Need visibility into production errors and performance issues
 - Monitor authentication flows and security events
 - Track user experience and Core Web Vitals
@@ -28,7 +29,7 @@ The secure member area requires comprehensive observability for monitoring error
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   environment: process.env.NODE_ENV,
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
   beforeSend(event, hint) {
     // Remove sensitive data
     return sanitizeEvent(event);
@@ -63,13 +64,12 @@ export async function signin(prevState: any, formData: FormData) {
       Sentry.captureMessage("Authentication failed", {
         level: "warning",
         tags: { flow: "login" },
-        extra: { status: response.status }
+        extra: { status: response.status },
       });
     }
-
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { component: "auth", action: "login" }
+      tags: { component: "auth", action: "login" },
     });
   }
 }
@@ -81,6 +81,7 @@ export async function signin(prevState: any, formData: FormData) {
 **Negative**: Additional bundle size, privacy considerations, third-party dependency
 
 ## Implementation Files
+
 - `sentry.client.config.ts` - Client configuration
 - `sentry.server.config.ts` - Server configuration
 - Authentication flows with Sentry integration

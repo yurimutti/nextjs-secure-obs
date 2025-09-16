@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Secure Dashboard",
-  description: "Next.js secure dashboard with authentication and full accessibility support",
+  description:
+    "Next.js secure dashboard with authentication and full accessibility support",
   viewport: {
     width: "device-width",
     initialScale: 1,

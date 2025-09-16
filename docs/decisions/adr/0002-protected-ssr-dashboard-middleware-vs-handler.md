@@ -11,6 +11,7 @@
 The secure member area requires server-side rendered (SSR) protected routes that ensure authenticated access while maintaining optimal performance. The dashboard must verify user authentication before rendering any sensitive content, preventing unauthorized access and information leakage.
 
 ### Problem Statement
+
 - Need server-side authentication verification for sensitive routes
 - Prevent unauthorized access to protected content
 - Maintain SEO benefits and performance of SSR
@@ -18,6 +19,7 @@ The secure member area requires server-side rendered (SSR) protected routes that
 - Support both page-level and API-level protection
 
 ### Constraints
+
 - Must work with Next.js 15 App Router
 - Need consistent authentication across pages and APIs
 - Must prevent flash of unauthorized content
@@ -71,11 +73,11 @@ graph TB
 
 ### Why DAL Pattern Over Pure Middleware?
 
-| Approach | Pages | APIs | Flexibility | Performance | Maintainability |
-|----------|-------|------|-------------|-------------|-----------------|
-| **Pure Middleware** | ✅ Global | ✅ Global | ❌ Limited | ✅ Fast | ❌ Complex routing |
-| **Route Guards** | ✅ Flexible | ✅ Flexible | ✅ High | ❌ N+1 queries | ❌ Scattered logic |
-| **DAL Pattern** | ✅ Optimal | ✅ Optimal | ✅ High | ✅ Cached | ✅ Centralized |
+| Approach            | Pages       | APIs        | Flexibility | Performance    | Maintainability    |
+| ------------------- | ----------- | ----------- | ----------- | -------------- | ------------------ |
+| **Pure Middleware** | ✅ Global   | ✅ Global   | ❌ Limited  | ✅ Fast        | ❌ Complex routing |
+| **Route Guards**    | ✅ Flexible | ✅ Flexible | ✅ High     | ❌ N+1 queries | ❌ Scattered logic |
+| **DAL Pattern**     | ✅ Optimal  | ✅ Optimal  | ✅ High     | ✅ Cached      | ✅ Centralized     |
 
 ### Core Decision Factors
 
@@ -125,7 +127,7 @@ export const verifySession = cache(async (): Promise<SessionData | null> => {
   return {
     userId: payload.userId,
     email: payload.email,
-    exp: payload.exp
+    exp: payload.exp,
   };
 });
 
@@ -197,10 +199,7 @@ export async function GET() {
   const session = await ensureSession();
 
   if (!session) {
-    return NextResponse.json(
-      { message: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   // Fetch and return user data
@@ -274,16 +273,17 @@ sequenceDiagram
 
 ### Risk Mitigation
 
-| Risk | Impact | Mitigation |
-|------|---------|------------|
-| **Cache Stale Data** | Medium | Short cache lifetime, request-scoped caching |
-| **Performance Regression** | Low | Cached session checks, efficient JWT validation |
-| **Security Bypass** | High | Centralized validation, comprehensive testing |
-| **Developer Confusion** | Medium | Clear documentation, consistent naming |
+| Risk                       | Impact | Mitigation                                      |
+| -------------------------- | ------ | ----------------------------------------------- |
+| **Cache Stale Data**       | Medium | Short cache lifetime, request-scoped caching    |
+| **Performance Regression** | Low    | Cached session checks, efficient JWT validation |
+| **Security Bypass**        | High   | Centralized validation, comprehensive testing   |
+| **Developer Confusion**    | Medium | Clear documentation, consistent naming          |
 
 ## Authentication Patterns
 
 ### Page Authentication Pattern
+
 ```typescript
 // Always redirects unauthorized users
 export default async function ProtectedPage() {
@@ -295,6 +295,7 @@ export default async function ProtectedPage() {
 ```
 
 ### API Authentication Pattern
+
 ```typescript
 // Returns 401 for unauthorized requests
 export async function GET() {
@@ -309,6 +310,7 @@ export async function GET() {
 ```
 
 ### Mixed Authentication Pattern
+
 ```typescript
 // Component that works in both contexts
 async function UserData() {
@@ -325,72 +327,78 @@ async function UserData() {
 ## Performance Considerations
 
 ### Caching Strategy
+
 - **Request-scoped caching**: React.cache() ensures single verification per request
 - **Token validation**: JWT verification happens once per request
 - **Database queries**: Cached session data prevents repeated user lookups
 
 ### Core Web Vitals Impact
+
 - **LCP**: Faster rendering with cached session checks
 - **CLS**: No layout shift from authentication loading states
 - **FID**: Immediate interactivity with SSR content
 
 ### Monitoring Metrics
+
 ```typescript
 // Performance tracking
 const performanceMetrics = {
-  sessionVerificationTime: '<10ms',
-  cacheHitRate: '>95%',
-  authenticationRedirectTime: '<100ms',
-  apiAuthenticationTime: '<5ms'
+  sessionVerificationTime: "<10ms",
+  cacheHitRate: ">95%",
+  authenticationRedirectTime: "<100ms",
+  apiAuthenticationTime: "<5ms",
 };
 ```
 
 ## Testing Strategy
 
 ### Unit Tests
+
 ```typescript
-describe('Data Access Layer', () => {
-  test('requireSession redirects when session invalid', async () => {
+describe("Data Access Layer", () => {
+  test("requireSession redirects when session invalid", async () => {
     // Mock invalid session
     // Verify redirect called
   });
 
-  test('ensureSession returns null when session invalid', async () => {
+  test("ensureSession returns null when session invalid", async () => {
     // Mock invalid session
     // Verify null returned
   });
 
-  test('verifySession caches results', async () => {
+  test("verifySession caches results", async () => {
     // Verify cache behavior
   });
 });
 ```
 
 ### Integration Tests
+
 ```typescript
-describe('Protected Routes', () => {
-  test('dashboard redirects unauthorized users', async () => {
+describe("Protected Routes", () => {
+  test("dashboard redirects unauthorized users", async () => {
     // Test unauthorized access
   });
 
-  test('API returns 401 for unauthorized requests', async () => {
+  test("API returns 401 for unauthorized requests", async () => {
     // Test API authentication
   });
 
-  test('session refresh works transparently', async () => {
+  test("session refresh works transparently", async () => {
     // Test token refresh flow
   });
 });
 ```
 
 ### Performance Tests
+
 ```typescript
-describe('Authentication Performance', () => {
-  test('session verification completes under 10ms', async () => {
+describe("Authentication Performance", () => {
+  test("session verification completes under 10ms", async () => {
     // Performance benchmark
   });
 
-  test('cache prevents duplicate verifications', async () => {
+  test("cache prevents duplicate verifications", async () => {
     // Cache efficiency test
   });
 });
@@ -399,7 +407,9 @@ describe('Authentication Performance', () => {
 ## How to Test
 
 ### Manual Testing
+
 1. **Authenticated Access**
+
    ```bash
    # Login first
    curl -X POST http://localhost:3004/api/auth/login \
@@ -414,6 +424,7 @@ describe('Authentication Performance', () => {
    ```
 
 2. **Unauthorized Access**
+
    ```bash
    # Access without authentication
    curl -X GET http://localhost:3004/dashboard -L -v
@@ -429,12 +440,14 @@ describe('Authentication Performance', () => {
    ```
 
 ### Browser Testing
+
 1. Navigate to `/dashboard` without logging in → Should redirect to `/login`
 2. Login with valid credentials → Should access dashboard
 3. Clear cookies and refresh dashboard → Should redirect to login
 4. Test API endpoints in Network tab → Verify proper authentication
 
 ### Performance Testing
+
 1. Use React DevTools Profiler to measure render times
 2. Monitor Network tab for duplicate authentication requests
 3. Verify single session verification per page load
@@ -466,10 +479,12 @@ describe('Authentication Performance', () => {
 ---
 
 **Implementation Files**:
+
 - `src/shared/libs/dal/index.ts` - Data Access Layer
 - `src/app/(private)/layout.tsx` - Protected layout implementation
 - `src/app/api/*/route.ts` - Protected API endpoints
 
 **Related ADRs**:
+
 - [ADR-0001](./0001-auth-storage-httpOnly-cookies.md) - Cookie storage mechanism
 - [ADR-0003](./0003-client-fetch-auth-pattern.md) - Client-side authentication

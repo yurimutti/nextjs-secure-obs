@@ -16,9 +16,7 @@ export async function Header({ children }: HeaderProps) {
       <div className="px-3">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <MobileMenu>
-              {children}
-            </MobileMenu>
+            <MobileMenu>{children}</MobileMenu>
 
             <Link href="/dashboard" className="flex items-center space-x-2">
               <span className="font-bold text-lg sm:text-xl">

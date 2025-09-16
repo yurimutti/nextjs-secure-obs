@@ -27,7 +27,8 @@ const ErrorNotFound = () => {
             Unfortunately, this page didn&apos;t take off!
           </h3>
           <p className="text-muted-foreground">
-            Try again and if it still doesn&apos;t work, you can contact our Support.
+            Try again and if it still doesn&apos;t work, you can contact our
+            Support.
           </p>
         </div>
 

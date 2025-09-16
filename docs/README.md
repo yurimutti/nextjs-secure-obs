@@ -39,12 +39,15 @@ src/
 ## Documentation Structure
 
 ### 📋 Decision Log
+
 - [decisions-log.md](./decisions/decisions-log.md) - Chronological record of all technical decisions
 
 ### 📐 RFC (Request for Comments)
+
 - [RFC 0001: Secure Member Area MVP](./decisions/rfc/0001-secure-member-area-mvp.md) - Initial architecture proposal
 
 ### 🏗️ ADR (Architecture Decision Records)
+
 1. [Auth Storage: HttpOnly Cookies](./decisions/adr/0001-auth-storage-httpOnly-cookies.md)
 2. [Protected SSR Dashboard: Middleware vs Handler](./decisions/adr/0002-protected-ssr-dashboard-middleware-vs-handler.md)
 3. [Client Fetch Authentication Pattern](./decisions/adr/0003-client-fetch-auth-pattern.md)
@@ -57,6 +60,7 @@ src/
 ## Documentation Conventions
 
 ### Status Labels
+
 - ✅ **Implemented** - Decision implemented and tested
 - 🚧 **In Progress** - Currently being implemented
 - 📋 **Proposed** - Awaiting approval/implementation
@@ -64,12 +68,14 @@ src/
 - 📝 **Superseded** - Replaced by newer decision
 
 ### Diagram Standards
+
 - **Mermaid** for all technical diagrams
 - **Sequence diagrams** for authentication flows
 - **Flowcharts** for decision trees
 - **Architecture diagrams** for system overview
 
 ### Code Examples
+
 - **TypeScript** pseudocode only
 - **No real tokens** or sensitive data
 - **Focus on patterns** rather than implementation details
@@ -85,6 +91,7 @@ src/
 ## Testing Strategy
 
 Each technical decision includes:
+
 - **Unit Test Requirements**
 - **Integration Test Scenarios**
 - **Manual Testing Steps**
@@ -93,6 +100,7 @@ Each technical decision includes:
 ## Contributing
 
 When making architectural changes:
+
 1. Create ADR first
 2. Get peer review
 3. Implement with tests
@@ -101,4 +109,4 @@ When making architectural changes:
 
 ---
 
-*Last updated: January 2025*
+_Last updated: January 2025_

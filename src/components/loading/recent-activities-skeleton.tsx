@@ -14,7 +14,9 @@ export function RecentActivitiesSkeleton() {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="space-y-1">
           <CardTitle>Recent Activities</CardTitle>
-          <CardDescription>Loading your latest actions and events</CardDescription>
+          <CardDescription>
+            Loading your latest actions and events
+          </CardDescription>
         </div>
         <Button
           variant="outline"

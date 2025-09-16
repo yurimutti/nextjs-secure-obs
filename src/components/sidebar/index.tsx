@@ -8,10 +8,17 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className }: SidebarProps) {
   return (
-    <nav className={cn("pb-6", className)} role="navigation" aria-label="Main navigation">
+    <nav
+      className={cn("pb-6", className)}
+      role="navigation"
+      aria-label="Main navigation"
+    >
       <div className="space-y-6 py-4">
         <div className="px-3">
-          <h2 className="mb-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider" id="nav-heading">
+          <h2
+            className="mb-3 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+            id="nav-heading"
+          >
             Navigation
           </h2>
           <ul className="space-y-1" aria-labelledby="nav-heading">

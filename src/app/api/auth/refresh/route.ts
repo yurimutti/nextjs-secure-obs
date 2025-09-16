@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
         level: "warning",
         extra: {
           hasPayload: !!refreshPayload,
-          hasUserId: !!(refreshPayload?.userId),
-          hasJti: !!(refreshPayload?.jti),
+          hasUserId: !!refreshPayload?.userId,
+          hasJti: !!refreshPayload?.jti,
           payloadKeys: refreshPayload ? Object.keys(refreshPayload) : [],
         },
       });

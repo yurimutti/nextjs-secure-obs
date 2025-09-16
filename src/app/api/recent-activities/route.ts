@@ -48,26 +48,28 @@ export async function GET(request: NextRequest) {
 
     Sentry.setUser({
       id: session.userId,
-      email: session.email
+      email: session.email,
     });
 
     // Simulate server error to demonstrate Sentry error capture
     const shouldError = Math.random() > ERROR_SIMULATION_THRESHOLD;
     if (shouldError) {
-      const simulatedError = new Error("Failed to fetch activities from database - Connection timeout");
+      const simulatedError = new Error(
+        "Failed to fetch activities from database - Connection timeout"
+      );
       simulatedError.name = "DatabaseTimeoutError";
 
       Sentry.captureException(simulatedError, {
         tags: {
           component: "api",
           route: "recent-activities",
-          error_type: "simulated"
+          error_type: "simulated",
         },
         extra: {
           userId: session.userId,
           simulationThreshold: ERROR_SIMULATION_THRESHOLD,
-          wasTriggered: true
-        }
+          wasTriggered: true,
+        },
       });
 
       throw simulatedError;
@@ -89,13 +91,13 @@ export async function GET(request: NextRequest) {
     Sentry.captureException(error, {
       tags: {
         component: "api",
-        route: "recent-activities"
+        route: "recent-activities",
       },
       extra: {
         method: request.method,
         url: request.url,
-        errorMessage: error instanceof Error ? error.message : String(error)
-      }
+        errorMessage: error instanceof Error ? error.message : String(error),
+      },
     });
     return NextResponse.json(
       { error: "Failed to fetch recent activities" },

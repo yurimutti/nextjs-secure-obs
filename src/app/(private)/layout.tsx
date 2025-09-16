@@ -15,7 +15,7 @@ export default async function PrivateLayout({
   return (
     <div className="min-h-screen bg-background">
       <SkipLinks />
-      
+
       <Header>
         <Sidebar />
       </Header>

@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
       url: request.url,
       method: request.method,
       userAgent: request.headers.get("user-agent"),
-      ip: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip"),
+      ip:
+        request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip"),
     });
 
     Sentry.addBreadcrumb({
@@ -28,7 +30,12 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       Sentry.captureMessage("Invalid JSON in login request", {
         level: "warning",
-        extra: { parseError: parseError instanceof Error ? parseError.message : String(parseError) },
+        extra: {
+          parseError:
+            parseError instanceof Error
+              ? parseError.message
+              : String(parseError),
+        },
       });
       return NextResponse.json(
         { message: "Invalid JSON payload" },

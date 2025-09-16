@@ -11,6 +11,7 @@
 The application handles state-changing operations (login, logout, data modifications) that require protection against Cross-Site Request Forgery (CSRF) attacks while maintaining a seamless user experience.
 
 ### Problem Statement
+
 - Protect against CSRF attacks on authentication endpoints
 - Secure state-changing API operations
 - Maintain usability with automatic form handling
@@ -25,10 +26,10 @@ The application handles state-changing operations (login, logout, data modificat
 ```typescript
 // Cookie configuration with CSRF protection
 const securityConfig = {
-  sameSite: 'strict' as const,  // Primary CSRF protection
-  httpOnly: true,               // XSS protection
-  secure: process.env.NODE_ENV === 'production', // HTTPS only
-  path: restrictedPath          // Path-based restrictions
+  sameSite: "strict" as const, // Primary CSRF protection
+  httpOnly: true, // XSS protection
+  secure: process.env.NODE_ENV === "production", // HTTPS only
+  path: restrictedPath, // Path-based restrictions
 };
 ```
 
@@ -37,23 +38,24 @@ const securityConfig = {
 ```typescript
 // Additional origin validation for critical operations
 export function validateOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('host');
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
 
   // Allow same-origin requests
-  return origin === `https://${host}` ||
-         origin === `http://${host}`; // Development only
+  return origin === `https://${host}` || origin === `http://${host}`; // Development only
 }
 ```
 
 ## Implementation
 
 ### Authentication Endpoints
+
 - **Login**: SameSite=Strict + origin validation
 - **Logout**: SameSite=Strict + origin validation
 - **Token Refresh**: Path restrictions + SameSite=Strict
 
 ### State-Changing APIs
+
 - All POST/PUT/DELETE operations validate SameSite cookies
 - Critical operations include additional origin checks
 - Idempotent operations designed for retry safety
@@ -64,6 +66,7 @@ export function validateOrigin(request: NextRequest): boolean {
 **Negative**: Stricter same-site requirements, potential issues with legitimate cross-origin requests
 
 ## Testing Strategy
+
 - Manual CSRF attack simulation
 - Cross-origin request testing
 - Browser compatibility validation

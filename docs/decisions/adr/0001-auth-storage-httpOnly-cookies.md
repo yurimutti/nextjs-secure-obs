@@ -11,6 +11,7 @@
 The secure member area requires a robust authentication storage mechanism that protects against common web vulnerabilities while maintaining good user experience. The application needs to store JWT tokens securely and handle token refresh automatically.
 
 ### Problem Statement
+
 - Need secure storage for JWT authentication tokens
 - Protect against XSS (Cross-Site Scripting) attacks
 - Prevent CSRF (Cross-Site Request Forgery) vulnerabilities
@@ -18,6 +19,7 @@ The secure member area requires a robust authentication storage mechanism that p
 - Support server-side rendering with authentication
 
 ### Constraints
+
 - Must work with Next.js 15 App Router
 - Need server-side access to authentication state
 - Must support automatic token refresh
@@ -32,16 +34,17 @@ The secure member area requires a robust authentication storage mechanism that p
 ```typescript
 // Cookie configuration
 const cookieConfig = {
-  httpOnly: true,           // Prevent JavaScript access
-  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-  sameSite: 'strict' as const, // CSRF protection
-  path: '/',                // Available across entire app
-  maxAge: 15 * 60,         // 15 minutes for access token
-  expires: tokenExpiry     // Sync with JWT expiration
-}
+  httpOnly: true, // Prevent JavaScript access
+  secure: process.env.NODE_ENV === "production", // HTTPS only in production
+  sameSite: "strict" as const, // CSRF protection
+  path: "/", // Available across entire app
+  maxAge: 15 * 60, // 15 minutes for access token
+  expires: tokenExpiry, // Sync with JWT expiration
+};
 ```
 
 ### Token Structure
+
 - **Access Token**: 15-minute expiry, path: `/`
 - **Refresh Token**: 7-day expiry, path: `/api/auth/refresh`
 - **JWT Claims**: `{userId, exp, iat, jti}`
@@ -57,12 +60,12 @@ const cookieConfig = {
 
 ### Why Not Alternatives?
 
-| Storage Method | Pros | Cons | Decision |
-|----------------|------|------|----------|
-| **localStorage** | Simple, large capacity | Vulnerable to XSS | ❌ Rejected |
-| **sessionStorage** | Tab-scoped, simple | Vulnerable to XSS, no SSR | ❌ Rejected |
-| **In-Memory** | Secure from XSS | Lost on page refresh | ❌ Rejected |
-| **HttpOnly Cookies** | XSS protection, SSR support | Limited size, CSRF risk | ✅ **Selected** |
+| Storage Method       | Pros                        | Cons                      | Decision        |
+| -------------------- | --------------------------- | ------------------------- | --------------- |
+| **localStorage**     | Simple, large capacity      | Vulnerable to XSS         | ❌ Rejected     |
+| **sessionStorage**   | Tab-scoped, simple          | Vulnerable to XSS, no SSR | ❌ Rejected     |
+| **In-Memory**        | Secure from XSS             | Lost on page refresh      | ❌ Rejected     |
+| **HttpOnly Cookies** | XSS protection, SSR support | Limited size, CSRF risk   | ✅ **Selected** |
 
 ## Implementation
 
@@ -120,9 +123,9 @@ sequenceDiagram
 
 ### Cookie Path Strategy
 
-| Token Type | Path | Rationale |
-|------------|------|-----------|
-| **Access Token** | `/` | Available throughout application |
+| Token Type        | Path                | Rationale                           |
+| ----------------- | ------------------- | ----------------------------------- |
+| **Access Token**  | `/`                 | Available throughout application    |
 | **Refresh Token** | `/api/auth/refresh` | Restricted to refresh endpoint only |
 
 ### Security Configuration
@@ -131,15 +134,15 @@ sequenceDiagram
 // Environment-specific security settings
 const securityConfig = {
   development: {
-    secure: false,        // Allow HTTP for localhost
-    sameSite: 'lax'      // More permissive for dev tools
+    secure: false, // Allow HTTP for localhost
+    sameSite: "lax", // More permissive for dev tools
   },
   production: {
-    secure: true,         // Require HTTPS
-    sameSite: 'strict',   // Maximum CSRF protection
-    domain: '.yourdomain.com' // Domain restriction
-  }
-}
+    secure: true, // Require HTTPS
+    sameSite: "strict", // Maximum CSRF protection
+    domain: ".yourdomain.com", // Domain restriction
+  },
+};
 ```
 
 ## Consequences
@@ -180,22 +183,24 @@ const securityConfig = {
 
 ### Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| **Cookie Size Limits** | Minimal JWT payload, separate refresh token |
-| **Debugging Difficulty** | Server-side logging, browser dev tools |
-| **HTTPS Requirement** | Development proxy, production SSL/TLS |
-| **CSRF Attacks** | SameSite=Strict, CSRF tokens for state changes |
+| Risk                     | Mitigation                                     |
+| ------------------------ | ---------------------------------------------- |
+| **Cookie Size Limits**   | Minimal JWT payload, separate refresh token    |
+| **Debugging Difficulty** | Server-side logging, browser dev tools         |
+| **HTTPS Requirement**    | Development proxy, production SSL/TLS          |
+| **CSRF Attacks**         | SameSite=Strict, CSRF tokens for state changes |
 
 ## Monitoring and Validation
 
 ### Security Metrics
+
 - Authentication bypass attempts
 - Cookie manipulation detection
 - Cross-site request monitoring
 - Token expiration handling
 
 ### Performance Metrics
+
 - Cookie processing time
 - Token refresh success rate
 - Authentication flow completion time
@@ -203,51 +208,54 @@ const securityConfig = {
 ### Testing Strategy
 
 #### Unit Tests
+
 ```typescript
-describe('Cookie Authentication', () => {
-  test('should set HttpOnly cookie with correct flags', () => {
+describe("Cookie Authentication", () => {
+  test("should set HttpOnly cookie with correct flags", () => {
     // Test cookie configuration
   });
 
-  test('should handle token expiration synchronization', () => {
+  test("should handle token expiration synchronization", () => {
     // Test expiry alignment
   });
 
-  test('should restrict refresh token path', () => {
+  test("should restrict refresh token path", () => {
     // Test path-based restrictions
   });
 });
 ```
 
 #### Integration Tests
+
 ```typescript
-describe('Authentication Flow', () => {
-  test('should authenticate with valid credentials', () => {
+describe("Authentication Flow", () => {
+  test("should authenticate with valid credentials", () => {
     // Test login flow
   });
 
-  test('should refresh tokens automatically', () => {
+  test("should refresh tokens automatically", () => {
     // Test refresh mechanism
   });
 
-  test('should handle token expiration', () => {
+  test("should handle token expiration", () => {
     // Test expiry handling
   });
 });
 ```
 
 #### Security Tests
+
 ```typescript
-describe('Security Validation', () => {
-  test('should prevent JavaScript access to HttpOnly cookies', () => {
+describe("Security Validation", () => {
+  test("should prevent JavaScript access to HttpOnly cookies", () => {
     // Test XSS protection
   });
 
-  test('should reject cross-site requests', () => {
+  test("should reject cross-site requests", () => {
     // Test CSRF protection
   });
 
-  test('should enforce secure flag in production', () => {
+  test("should enforce secure flag in production", () => {
     // Test HTTPS requirement
   });
 });
@@ -256,7 +264,9 @@ describe('Security Validation', () => {
 ## How to Test
 
 ### Manual Testing
+
 1. **Login Flow**
+
    ```bash
    # Test successful authentication
    curl -X POST http://localhost:3004/api/auth/login \
@@ -266,6 +276,7 @@ describe('Security Validation', () => {
    ```
 
 2. **Cookie Inspection**
+
    ```bash
    # Verify cookie flags
    cat cookies.txt
@@ -281,6 +292,7 @@ describe('Security Validation', () => {
    ```
 
 ### Browser Testing
+
 1. Open Network tab in dev tools
 2. Complete login flow
 3. Verify Set-Cookie headers contain proper flags
@@ -288,6 +300,7 @@ describe('Security Validation', () => {
 5. Test automatic refresh on protected routes
 
 ### Security Testing
+
 1. **XSS Prevention**: Attempt `document.cookie` access - should not see HttpOnly cookies
 2. **CSRF Protection**: Make cross-origin requests - should be blocked by SameSite
 3. **Token Manipulation**: Modify cookie values - should result in authentication failure
@@ -319,10 +332,12 @@ describe('Security Validation', () => {
 ---
 
 **Implementation Files**:
+
 - `src/shared/libs/session/index.ts` - Cookie management utilities
 - `src/app/api/auth/login/route.ts` - Authentication endpoint
 - `src/app/api/auth/refresh/route.ts` - Token refresh endpoint
 
 **Related ADRs**:
+
 - [ADR-0002](./0002-protected-ssr-dashboard-middleware-vs-handler.md) - SSR authentication
 - [ADR-0006](./0006-csrf-and-state-changing-requests.md) - CSRF protection
