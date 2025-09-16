@@ -69,7 +69,6 @@ export async function signin(state: FormState, formData: FormData) {
       message: data.message || "Authentication failed",
     };
   } catch (error) {
-    // Don't capture Next.js redirect as an error
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error;
     }
