@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { QueryProvider } from "@/providers/query-provider";
 import "../styles/globals.css";
+import "./accessibility.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Secure Dashboard",
-  description: "Next.js secure dashboard with authentication",
+  description: "Next.js secure dashboard with authentication and full accessibility support",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+  },
+  other: {
+    "color-scheme": "light dark",
+    "theme-color": "#ffffff",
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

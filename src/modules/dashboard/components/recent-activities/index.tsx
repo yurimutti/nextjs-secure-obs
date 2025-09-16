@@ -24,6 +24,7 @@ import {
   useRecentActivities,
   useRefreshActivities,
 } from "@/modules/dashboard/hooks/use-recent-activities";
+import { useScreenReaderAnnouncement } from "@/shared/hooks/use-screen-reader";
 
 const formatTimestamp = (timestamp: string) => {
   return new Date(timestamp).toLocaleString("pt-BR", {
@@ -52,6 +53,7 @@ const statusConfig = {
 
 export function RecentActivities() {
   const { data, isLoading, error, refetch } = useRecentActivities({ limit: 8 });
+  const { announce } = useScreenReaderAnnouncement();
 
   const refreshMutation = useRefreshActivities();
 
@@ -60,8 +62,11 @@ export function RecentActivities() {
 
   const handleRefresh = async () => {
     try {
+      announce("Atualizando atividades recentes...", "polite");
       await refreshMutation.mutateAsync({ limit: 8 });
+      announce("Atividades atualizadas com sucesso", "polite");
     } catch (error) {
+      announce("Erro ao atualizar atividades", "assertive");
       Sentry.captureException(error, {
         tags: {
           component: "recent-activities",
@@ -122,6 +127,7 @@ export function RecentActivities() {
               onClick={() => refetch()}
               variant="outline"
               disabled={isRefreshing}
+              aria-label={isRefreshing ? "Retrying to load activities" : "Retry loading activities"}
             >
               {isRefreshing ? "Tentando..." : "Tentar Novamente"}
             </Button>
@@ -143,9 +149,11 @@ export function RecentActivities() {
           size="icon"
           onClick={handleRefresh}
           disabled={isRefreshing}
+          aria-label={isRefreshing ? "Refreshing activities" : "Refresh activities"}
         >
           <RefreshCw
             className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+            aria-hidden="true"
           />
         </Button>
       </CardHeader>
@@ -153,21 +161,21 @@ export function RecentActivities() {
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8">
             <p className="text-muted-foreground">
-              Nenhuma atividade recente encontrada
+              Nenhuma atividade recente encontrada (somente para erro de backend, atualize a página)
             </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Ação</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Data/Hora</TableHead>
+          <Table role="table" aria-label="Recent user activities">
+            <TableHeader role="rowgroup">
+              <TableRow role="row">
+                <TableHead role="columnheader">Ação</TableHead>
+                <TableHead role="columnheader">Status</TableHead>
+                <TableHead role="columnheader">Data/Hora</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody role="rowgroup">
               {activities.map((activity) => (
-                <TableRow key={activity.id} className="hover:bg-muted/50">
+                <TableRow key={activity.id} className="hover:bg-muted/50" role="row">
                   <TableCell>
                     <div className="space-y-1">
                       <p className="font-medium text-sm">{activity.action}</p>

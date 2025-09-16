@@ -18,15 +18,15 @@ export function LoginScreen() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-md shadow-lg" role="main">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-bold" id="login-heading">Login</CardTitle>
+          <CardDescription id="login-description">
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <form action={action} className="space-y-4">
+          <form action={action} className="space-y-4" aria-labelledby="login-heading" aria-describedby="login-description">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -35,25 +35,39 @@ export function LoginScreen() {
                 type="email"
                 placeholder="name@example.com"
                 required
+                aria-describedby={state?.errors?.email ? "email-error" : undefined}
+                aria-invalid={state?.errors?.email ? "true" : "false"}
               />
             </div>
             {state?.errors?.email && (
-              <p className="text-red-500 text-sm">{state.errors.email}</p>
+              <p className="text-red-500 text-sm" id="email-error" role="alert" aria-live="polite">{state.errors.email}</p>
             )}
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                aria-describedby={state?.errors?.password ? "password-error" : undefined}
+                aria-invalid={state?.errors?.password ? "true" : "false"}
+              />
             </div>
             {state?.errors?.password && (
-              <p className="text-red-500 text-sm">{state.errors.password}</p>
+              <p className="text-red-500 text-sm" id="password-error" role="alert" aria-live="polite">{state.errors.password}</p>
             )}
 
             {state?.message && (
-              <p className="text-red-500 text-sm">{state.message}</p>
+              <p className="text-red-500 text-sm" role="alert" aria-live="polite">{state.message}</p>
             )}
 
-            <Button disabled={pending} type="submit" className="w-full">
+            <Button
+              disabled={pending}
+              type="submit"
+              className="w-full"
+              aria-describedby="login-description"
+            >
               {pending ? "Logging In..." : "Login"}
             </Button>
           </form>

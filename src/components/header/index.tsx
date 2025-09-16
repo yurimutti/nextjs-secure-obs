@@ -59,12 +59,14 @@ export function Header({ children }: HeaderProps) {
 
           <div className="flex items-center space-x-4">
             <div className="hidden sm:block">
-              <div className="relative">
+              <div className="relative" id="search">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Search..."
                   className="w-64 pl-10 md:w-80"
+                  aria-label="Search"
+                  role="searchbox"
                 />
               </div>
             </div>
@@ -79,9 +81,10 @@ export function Header({ children }: HeaderProps) {
                 <Button
                   variant="ghost"
                   className="relative h-9 w-9 rounded-full"
+                  aria-label="Open user menu"
                 >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/avatars/01.png" alt="@johndoe" />
+                    <AvatarImage src="/avatars/01.png" alt="John Doe profile picture" />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -110,6 +113,7 @@ export function Header({ children }: HeaderProps) {
                     <button
                       type="submit"
                       className="flex w-full items-center px-2 py-1.5 text-sm"
+                      aria-label="Log out of your account"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
