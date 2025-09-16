@@ -33,8 +33,16 @@ async function fetchRecentActivities(
   const response = await authFetch(`/api/recent-activities?${searchParams}`);
 
   if (!response.ok) {
-    toast.error(`Error ${response.status}: ${response.statusText}`);
-    throw new Error("Failed to fetch recent activities");
+    try {
+      const errorData = await response.json();
+      const message = errorData.message || errorData.error || "Failed to fetch recent activities";
+      toast.error(message);
+      throw new Error(message);
+    } catch {
+      const message = response.status === 401 ? "Authentication required" : "Failed to fetch recent activities";
+      toast.error(message);
+      throw new Error(message);
+    }
   }
 
   return response.json();
