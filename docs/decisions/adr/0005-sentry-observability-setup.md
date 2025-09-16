@@ -1,7 +1,7 @@
 # ADR-0005: Sentry Observability Setup
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Development Team, DevOps Team
 **Consulted**: Security Team
 **Informed**: Product Team

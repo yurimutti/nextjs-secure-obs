@@ -1,7 +1,7 @@
 # ADR-0006: CSRF and State-Changing Requests
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Security Team, Development Team
 **Consulted**: Infrastructure Team
 **Informed**: Product Team

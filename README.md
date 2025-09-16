@@ -216,16 +216,86 @@ yarn test:e2e
 ### **Test Structure**
 
 ```
-├── __tests__/              # Unit tests
-│   ├── components/         # Component tests
-│   ├── lib/               # Utility function tests
-│   └── app/               # Page and API tests
-├── cypress/               # E2E tests
-│   ├── e2e/              # Test scenarios
-│   ├── fixtures/         # Test data
-│   └── support/          # Helper functions
-└── jest.config.js        # Jest configuration
+├── tests/                 # Test utilities and setup
+│   ├── setup/            # Jest setup and configuration
+│   ├── utils/            # Test utilities (render, hooks)
+│   └── msw/              # MSW server and handlers setup
+├── src/                  # Component tests alongside source
+│   └── *//__tests__/     # Unit tests (e.g., src/shared/libs/dal/__tests__/)
+├── cypress/              # E2E tests
+│   ├── e2e/             # Test scenarios
+│   ├── fixtures/        # Test data
+│   └── support/         # Helper functions
+└── jest.config.js       # Jest configuration
 ```
+
+## 📁 Project Structure
+
+This project follows a feature-based architecture with clear separation of concerns:
+
+```
+├── src/
+│   ├── app/                     # Next.js 15 App Router
+│   │   ├── (auth)/             # Authentication route group
+│   │   ├── (private)/          # Protected route group
+│   │   ├── api/                # API route handlers
+│   │   ├── layout.tsx          # Root layout with providers
+│   │   ├── page.tsx            # Landing page
+│   │   ├── error.tsx           # Error boundary
+│   │   └── global-error.tsx    # Global error handler
+│   │
+│   ├── components/             # Reusable UI components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── header/             # Header navigation
+│   │   ├── sidebar/            # Dashboard sidebar
+│   │   ├── loading/            # Loading components
+│   │   ├── error/              # Error components
+│   │   └── skip-link/          # Accessibility components
+│   │
+│   ├── modules/                # Feature modules
+│   │   ├── auth/               # Authentication module
+│   │   │   ├── components/     # Auth-specific components
+│   │   │   ├── services/       # Auth API services
+│   │   │   └── types/          # Auth type definitions
+│   │   └── dashboard/          # Dashboard module
+│   │       ├── components/     # Dashboard components
+│   │       ├── services/       # Dashboard API services
+│   │       └── types/          # Dashboard types
+│   │
+│   ├── providers/              # React context providers
+│   │   ├── auth-provider/      # Authentication state
+│   │   └── query-provider/     # React Query setup
+│   │
+│   ├── shared/                 # Shared utilities and libraries
+│   │   ├── constants/          # Application constants
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── libs/               # Utility libraries
+│   │   │   ├── dal/           # Data Access Layer (SSR auth)
+│   │   │   └── session/       # Session management
+│   │   ├── types/              # Shared TypeScript types
+│   │   └── utils/              # Utility functions
+│   │
+│   ├── config/                 # Configuration files
+│   │   └── env/               # Environment variables setup
+│   │
+│   ├── styles/                 # Global styles and CSS
+│   ├── middleware.ts           # Next.js middleware (auth)
+│   └── instrumentation.ts      # Sentry instrumentation
+│
+├── tests/                      # Test configuration and utilities
+├── cypress/                    # End-to-end tests
+├── docs/                       # Technical documentation
+└── public/                     # Static assets
+```
+
+### **Architecture Principles**
+
+- **Feature-based modules**: Authentication and dashboard are separate modules with their own components, services, and types
+- **Shared utilities**: Common functionality is centralized in the `shared/` directory
+- **Route groups**: Next.js route groups organize pages by access level (auth vs private)
+- **Data Access Layer**: Server-side authentication validation through `shared/libs/dal/`
+- **Provider pattern**: React context providers manage global state (auth, query client)
+- **Component co-location**: Related components are grouped by feature or purpose
 
 ## 📚 Documentation
 

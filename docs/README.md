@@ -19,22 +19,71 @@ This documentation provides comprehensive technical insights into a secure membe
 
 ## Project Structure
 
+This project follows a feature-based architecture with clear separation of concerns:
+
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── (private)/         # Protected dashboard routes
-│   └── api/               # Route handlers (mocks)
-├── components/            # UI components
-├── modules/               # Feature modules
-│   ├── auth/              # Authentication logic
-│   └── dashboard/         # Dashboard features
-├── shared/                # Shared utilities
-│   ├── libs/              # Core libraries (DAL, session)
-│   ├── types/             # TypeScript definitions
-│   └── hooks/             # Reusable hooks
-└── styles/                # Global styles
+├── src/
+│   ├── app/                     # Next.js 15 App Router
+│   │   ├── (auth)/             # Authentication route group
+│   │   ├── (private)/          # Protected route group
+│   │   ├── api/                # API route handlers
+│   │   ├── layout.tsx          # Root layout with providers
+│   │   ├── page.tsx            # Landing page
+│   │   ├── error.tsx           # Error boundary
+│   │   └── global-error.tsx    # Global error handler
+│   │
+│   ├── components/             # Reusable UI components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── header/             # Header navigation
+│   │   ├── sidebar/            # Dashboard sidebar
+│   │   ├── loading/            # Loading components
+│   │   ├── error/              # Error components
+│   │   └── skip-link/          # Accessibility components
+│   │
+│   ├── modules/                # Feature modules
+│   │   ├── auth/               # Authentication module
+│   │   │   ├── components/     # Auth-specific components
+│   │   │   ├── services/       # Auth API services
+│   │   │   └── types/          # Auth type definitions
+│   │   └── dashboard/          # Dashboard module
+│   │       ├── components/     # Dashboard components
+│   │       ├── services/       # Dashboard API services
+│   │       └── types/          # Dashboard types
+│   │
+│   ├── providers/              # React context providers
+│   │   ├── auth-provider/      # Authentication state
+│   │   └── query-provider/     # React Query setup
+│   │
+│   ├── shared/                 # Shared utilities and libraries
+│   │   ├── constants/          # Application constants
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── libs/               # Utility libraries
+│   │   │   ├── dal/           # Data Access Layer (SSR auth)
+│   │   │   └── session/       # Session management
+│   │   ├── types/              # Shared TypeScript types
+│   │   └── utils/              # Utility functions
+│   │
+│   ├── config/                 # Configuration files
+│   │   └── env/               # Environment variables setup
+│   │
+│   ├── styles/                 # Global styles and CSS
+│   ├── middleware.ts           # Next.js middleware (auth)
+│   └── instrumentation.ts      # Sentry instrumentation
+│
+├── tests/                      # Test configuration and utilities
+├── cypress/                    # End-to-end tests
+├── docs/                       # Technical documentation
+└── public/                     # Static assets
 ```
+
+### **Architecture Principles**
+
+- **Feature-based modules**: Authentication and dashboard are separate modules with their own components, services, and types
+- **Shared utilities**: Common functionality is centralized in the `shared/` directory
+- **Route groups**: Next.js route groups organize pages by access level (auth vs private)
+- **Data Access Layer**: Server-side authentication validation through `shared/libs/dal/`
+- **Provider pattern**: React context providers manage global state (auth, query client)
+- **Component co-location**: Related components are grouped by feature or purpose
 
 ## Documentation Structure
 
@@ -88,72 +137,51 @@ src/
 4. **Include Testing**: Add "How to Test" section to each ADR
 5. **Mark Status**: Update status as implementation progresses
 
-## Testing Strategy
+## Key Features & Architecture Decisions
 
-Each technical decision includes:
+### **Data Access Layer (DAL)**
 
-- **Unit Test Requirements**
-- **Integration Test Scenarios**
-- **Manual Testing Steps**
-- **Performance Benchmarks** (where applicable)
+The DAL provides server-side authentication validation with strong security patterns:
 
-### DAL (Data Access Layer) Testing
+- **Server-only execution**: Ensures authentication logic never runs on client
+- **Cookie-based sessions**: Secure HttpOnly JWT token management
+- **Type-safe interfaces**: Strong TypeScript definitions for user and session data
+- **Error handling**: Graceful degradation for invalid or expired sessions
+- **Sentry integration**: Comprehensive error tracking and monitoring
 
-The DAL layer uses **inline mocking** for better test isolation and maintainability:
+**Key DAL Functions:**
+- `verifySession()` - Validates JWT tokens from HttpOnly cookies
+- `getUser()` - Retrieves authenticated user data
+- `createSession()` - Establishes new user sessions
+- **Location**: `src/shared/libs/dal/`
 
-- **Self-contained tests**: All mocks are defined within the test file (`src/shared/libs/dal/__tests__/index.test.ts`)
-- **Simple mock objects**: Basic implementations using Map-based storage for cookies and headers
-- **No external dependencies**: Removed dependency on external mock files (`tests/mocks/next-apis.ts`)
-- **Next.js integration**: Mocks for `next/headers`, `server-only`, `@sentry/nextjs`, `jose`, and React components
+### **Authentication Module**
 
-#### Key Testing Functions:
-- `mockNextHeaders()` - Simulates Next.js headers and cookies
-- `mockServerOnly()` - Mocks server-only directive
-- `mockSentry()` - Stubs Sentry logging functions
-- `mockJose()` - Mocks JWT verification and signing
-- `resetMocks()` - Cleans state between tests
+Enterprise-grade authentication with security-first design:
 
-#### Running DAL Tests:
-```bash
-npm test -- --testPathPattern=dal
-```
+- **HttpOnly cookies**: JWT tokens stored securely, inaccessible to JavaScript
+- **CSRF protection**: SameSite=Strict cookie configuration
+- **Automatic refresh**: Transparent token renewal without user intervention
+- **Protected routes**: Server-side validation for dashboard access
+- **Error boundaries**: Graceful handling of authentication failures
 
-### E2E Testing with Cypress
+### **Dashboard Module**
 
-The project includes **Cypress** for end-to-end testing, focusing on the critical authentication flow:
+Server-side rendered protected dashboard with performance optimization:
 
-- **Test coverage**: Login → API authentication → Dashboard access
-- **Custom commands**: Reusable commands for common auth flows
-- **Data attributes**: Uses `data-cy` attributes for reliable element selection
-- **API testing**: Validates authentication API responses and behavior
+- **SSR protection**: Routes validated server-side before rendering
+- **React Query integration**: Efficient client-side data fetching and caching
+- **Loading states**: Smooth user experience with skeleton components
+- **Error handling**: User-friendly error messages and retry mechanisms
 
-#### Key E2E Test Files:
-- `cypress/e2e/auth-flow.cy.ts` - Complete authentication flow tests
-- `cypress/support/commands.ts` - Custom commands (`cy.login()`, `cy.shouldBeOnDashboard()`)
-- `cypress/fixtures/user.json` - Test user credentials
+### **Observability & Monitoring**
 
-#### Running E2E Tests:
-```bash
-# Open Cypress Test Runner (interactive)
-npm run e2e:open
+Comprehensive monitoring setup with Sentry integration:
 
-# Run tests headlessly
-npm run e2e
-
-# Run tests in CI mode
-npm run e2e:ci
-
-# Start dev server and run E2E tests
-npm run test:e2e
-```
-
-#### Test Scenarios Covered:
-- ✅ Successful login with valid credentials
-- ✅ Failed login with invalid credentials
-- ✅ Protected route redirection
-- ✅ Session persistence across page refreshes
-- ✅ API endpoint validation
-- ✅ Custom command usage
+- **Error tracking**: Client and server-side error capture
+- **Performance monitoring**: Core Web Vitals and runtime metrics
+- **User context**: Enhanced debugging with user session data
+- **Breadcrumbs**: Detailed activity tracking for issue reproduction
 
 ## Contributing
 
@@ -167,4 +195,4 @@ When making architectural changes:
 
 ---
 
-_Last updated: January 2025_
+_Last updated: September 2025_

@@ -1,7 +1,7 @@
 # ADR-0008: Internationalization, A11y and Responsiveness
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Frontend Team, UX Team
 **Consulted**: Accessibility Team, i18n Team
 **Informed**: Product Team

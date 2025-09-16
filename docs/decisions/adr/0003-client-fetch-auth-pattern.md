@@ -1,7 +1,7 @@
 # ADR-0003: Client Fetch Authentication Pattern
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Frontend Team, Security Team
 **Consulted**: Backend Team
 **Informed**: Product Team

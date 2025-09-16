@@ -1,7 +1,7 @@
 # ADR-0004: API Mocks with Route Handlers
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Development Team
 **Consulted**: Backend Team
 **Informed**: Product Team

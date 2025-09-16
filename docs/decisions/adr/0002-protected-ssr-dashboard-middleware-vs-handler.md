@@ -1,7 +1,7 @@
 # ADR-0002: Protected SSR Dashboard - Middleware vs Handler Approach
 
 **Status**: ✅ Implemented
-**Date**: January 16, 2025
+**Date**: September 16, 2025
 **Decision Makers**: Development Team
 **Consulted**: Security Team, Performance Team
 **Informed**: Product Team
