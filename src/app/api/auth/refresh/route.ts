@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
 
     Sentry.setUser({
       id: userId,
-      email: refreshPayload.email,
     });
 
     const newAccessToken = await encryptAccessToken(userId);
