@@ -25,6 +25,8 @@ export async function signin(state: FormState, formData: FormData) {
   const { email, password } = validatedFields.data;
   const { url, headers: requestHeaders } = await getRequestUrl('/api/auth/login');
 
+  console.log('Debug signin URL:', url);
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -60,13 +62,18 @@ export async function signin(state: FormState, formData: FormData) {
       await setAccessCookie(data.accessToken);
       await setRefreshCookie(data.refreshToken);
 
-      redirect("/dashboard");
+      return redirect("/dashboard");
     }
 
     return {
       message: data.message || "Authentication failed",
     };
   } catch (error) {
+    // Don't capture Next.js redirect as an error
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
+
     Sentry.captureException(error, {
       tags: {
         component: "auth-actions",
@@ -109,6 +116,11 @@ export async function logout() {
 
     redirect("/logout");
   } catch (error) {
+    // Don't capture Next.js redirect as an error
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
+
     Sentry.captureException(error, {
       tags: {
         component: "auth-actions",
