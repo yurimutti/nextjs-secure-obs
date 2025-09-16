@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
 
     Sentry.setUser({
       id: session.userId,
-      email: session.email,
     });
 
     Sentry.addBreadcrumb({

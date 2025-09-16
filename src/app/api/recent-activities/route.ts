@@ -48,7 +48,6 @@ export async function GET(request: NextRequest) {
 
     Sentry.setUser({
       id: session.userId,
-      email: session.email,
     });
 
     // Simulate server error to demonstrate Sentry error capture
