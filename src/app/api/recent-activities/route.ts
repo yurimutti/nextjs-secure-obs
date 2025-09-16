@@ -3,9 +3,8 @@ import { ensureSession } from "@/shared/libs/dal";
 import * as Sentry from "@sentry/nextjs";
 import type { Activity } from "./types";
 
-// Local constants for mock data generation
 const MOCK_ACTIVITIES_COUNT = 20;
-const ERROR_SIMULATION_THRESHOLD = 0.9; // 10% chance of error
+const ERROR_SIMULATION_THRESHOLD = 0.8; // 20% chance of error
 
 const generateMockActivities = (): Activity[] => {
   const actions = [
@@ -50,11 +49,10 @@ export async function GET(request: NextRequest) {
       id: session.userId,
     });
 
-    // Simulate server error to demonstrate Sentry error capture
     const shouldError = Math.random() > ERROR_SIMULATION_THRESHOLD;
     if (shouldError) {
       const simulatedError = new Error(
-        "Failed to fetch activities from database - Connection timeout"
+        "Simulated database timeout error for testing purposes"
       );
       simulatedError.name = "DatabaseTimeoutError";
 
@@ -99,7 +97,9 @@ export async function GET(request: NextRequest) {
       },
     });
     return NextResponse.json(
-      { error: "Failed to fetch recent activities" },
+      {
+        error: error instanceof Error ? error.message : "Internal Server Error",
+      },
       { status: 500 }
     );
   }
