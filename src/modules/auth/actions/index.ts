@@ -25,7 +25,6 @@ export async function signin(state: FormState, formData: FormData) {
   const { email, password } = validatedFields.data;
   const { url, headers: requestHeaders } = await getRequestUrl('/api/auth/login');
 
-  console.log('Debug signin URL:', url);
 
   try {
     const response = await fetch(url, {

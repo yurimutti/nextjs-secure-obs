@@ -1,14 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import * as Sentry from "@sentry/nextjs";
+import toast from "react-hot-toast";
 
+import { authFetch } from "@/modules/auth/utils/auth-fetch";
 import type {
   RecentActivitiesResponse,
   RecentActivitiesParams,
 } from "@/modules/dashboard/types/activity";
-import toast from "react-hot-toast";
-
-import { authFetch } from "@/modules/auth/utils/auth-fetch";
-
 import {
   QUERY_KEYS,
   QUERY_STALE_TIME,
@@ -17,57 +20,75 @@ import {
   DEFAULT_ACTIVITIES_OFFSET,
 } from "../constants";
 
-async function fetchRecentActivities(
-  params: RecentActivitiesParams = {}
-): Promise<RecentActivitiesResponse> {
-  const {
-    limit = DEFAULT_ACTIVITIES_LIMIT,
-    offset = DEFAULT_ACTIVITIES_OFFSET,
-  } = params;
-
-  const searchParams = new URLSearchParams({
-    limit: limit.toString(),
-    offset: offset.toString(),
-  });
-
-  const response = await authFetch(`/api/recent-activities?${searchParams}`);
-
-  if (!response.ok) {
-    try {
-      const errorData = await response.json();
-      const message = errorData.message || errorData.error || "Failed to fetch recent activities";
-      toast.error(message);
-      throw new Error(message);
-    } catch {
-      const message = response.status === 401 ? "Authentication required" : "Failed to fetch recent activities";
-      toast.error(message);
-      throw new Error(message);
-    }
-  }
-
-  return response.json();
-}
-
-export function useRecentActivities(params: RecentActivitiesParams = {}) {
+export const useRecentActivities = (
+  params: RecentActivitiesParams = {},
+  options?: UseQueryOptions<RecentActivitiesResponse, Error>
+) => {
   return useQuery({
     queryKey: QUERY_KEYS.recentActivities(params),
-    queryFn: () => fetchRecentActivities(params),
+    queryFn: async (): Promise<RecentActivitiesResponse> => {
+      const {
+        limit = DEFAULT_ACTIVITIES_LIMIT,
+        offset = DEFAULT_ACTIVITIES_OFFSET,
+      } = params;
+
+      const searchParams = new URLSearchParams({
+        limit: limit.toString(),
+        offset: offset.toString(),
+      });
+
+      const response = await authFetch(`/api/recent-activities?${searchParams}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || errorData.error || "Failed to fetch recent activities";
+        throw new Error(message);
+      }
+
+      return response.json();
+    },
     staleTime: QUERY_STALE_TIME,
     gcTime: QUERY_GC_TIME,
+    ...options,
   });
-}
+};
 
-export function useRefreshActivities() {
+export const useRefreshActivities = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<
+    RecentActivitiesResponse,
+    Error,
+    RecentActivitiesParams
+  >({
     mutationFn: async (params: RecentActivitiesParams = {}) => {
-      return fetchRecentActivities(params);
+      const {
+        limit = DEFAULT_ACTIVITIES_LIMIT,
+        offset = DEFAULT_ACTIVITIES_OFFSET,
+      } = params;
+
+      const searchParams = new URLSearchParams({
+        limit: limit.toString(),
+        offset: offset.toString(),
+      });
+
+      const response = await authFetch(`/api/recent-activities?${searchParams}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData.message || errorData.error || "Failed to fetch recent activities";
+        throw new Error(message);
+      }
+
+      return response.json();
     },
     onSuccess: (data, variables) => {
       queryClient.setQueryData(QUERY_KEYS.recentActivities(variables), data);
+      toast.success("Atividades atualizadas com sucesso");
     },
     onError: (error) => {
+      const message = error.message || "Erro ao atualizar atividades";
+      toast.error(message);
       Sentry.captureException(error, {
         tags: {
           component: "dashboard-hooks",
@@ -79,9 +100,9 @@ export function useRefreshActivities() {
       });
     },
   });
-}
+};
 
-export function useInvalidateActivities() {
+export const useInvalidateActivities = () => {
   const queryClient = useQueryClient();
 
   return () => {
@@ -89,4 +110,4 @@ export function useInvalidateActivities() {
       queryKey: ["recent-activities"],
     });
   };
-}
+};

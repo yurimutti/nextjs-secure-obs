@@ -40,23 +40,24 @@ export function SentryErrorTest() {
 
   const handleThrowError = async () => {
     setIsLoading(true);
-
     try {
       await Sentry.startSpan(
-        {
-          name: "Dashboard Error Test",
-          op: "test",
-        },
+        { name: "Dashboard Error Test", op: "test" },
         async () => {
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          const err = new DashboardSentryError(
+            "Test error from dashboard (client) — Sentry smoke"
+          );
+          Sentry.captureException(err, {
+            tags: { area: "dashboard", kind: "smoke" },
+            level: "error",
+          });
+          await Sentry.flush(2000);
           setHasSentError(true);
         }
       );
-
-      throw new DashboardSentryError(
-        "Test error thrown from dashboard - this is expected for Sentry testing"
-      );
-    } catch {
+    } catch (e) {
+      Sentry.captureException(e);
+    } finally {
       setIsLoading(false);
     }
   };

@@ -167,8 +167,7 @@ export function RecentActivities() {
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8">
             <p className="text-muted-foreground">
-              Nenhuma atividade recente encontrada (somente para erro de
-              backend, atualize a página)
+              Nenhuma atividade recente encontrada
             </p>
           </div>
         ) : (
